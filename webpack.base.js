@@ -9,9 +9,15 @@ const tsconfigPath = path.join(__dirname, 'tsconfig.webpack.json')
 module.exports = ({ entry, mode, filename, types, keepBuildEnvVariables, plugins }) => ({
   entry,
   mode,
+  experiments: {
+    outputModule: true,
+  },
   output: {
     filename,
     path: path.resolve('./bundle'),
+    library: {
+      type: 'module',
+    },
   },
   target: ['web', 'es5'],
   devtool: false,
@@ -43,12 +49,16 @@ module.exports = ({ entry, mode, filename, types, keepBuildEnvVariables, plugins
     },
   },
 
+  // optimization: {
+  //   chunkIds: 'named',
+  //   minimizer: [
+  //     new TerserPlugin({
+  //       extractComments: false,
+  //     }),
+  //   ],
+  // },
   optimization: {
-    minimizer: [
-      new TerserPlugin({
-        extractComments: false,
-      }),
-    ],
+    minimize: false
   },
 
   plugins: [

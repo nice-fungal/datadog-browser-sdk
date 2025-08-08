@@ -1,0 +1,15 @@
+{
+  "name": "@head.js/datadog-browser-rum-slim",
+  "version": "5.35.0-1",
+  "description": "",
+  "author": "hbrls <shuaizhexu@gmail.com>",
+  "license": "MIT",
+  "main": "datadog-rum-slim.js",
+  "scripts": {
+    "build": "terser --comments false --compress --timings --format beautify --output ./datadogcom-browser-rum-slim.js ./datadog-rum-slim.js",
+    "dist": "terser --comments false --compress --mangle --toplevel --timings --output ./datadogcom-browser-rum-slim.min.js ./datadog-rum-slim.js"
+  },
+  "devDependencies": {
+    "terser": "5.5.1"
+  }
+}
