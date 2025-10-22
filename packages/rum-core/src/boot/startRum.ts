@@ -17,8 +17,8 @@ import {
   // addTelemetryDebug,
   CustomerDataType,
   // drainPreStartTelemetry,
-  isExperimentalFeatureEnabled,
-  ExperimentalFeature,
+  // isExperimentalFeatureEnabled,
+  // ExperimentalFeature,
 } from '@datadog/browser-core'
 import { createDOMMutationObservable } from '../browser/domMutationObservable'
 import { createWindowOpenObservable } from '../browser/windowOpenObservable'
@@ -41,7 +41,7 @@ import type { LocationChange } from '../browser/locationChangeObservable'
 import { createLocationChangeObservable } from '../browser/locationChangeObservable'
 import type { RumConfiguration } from '../domain/configuration'
 import type { ViewOptions } from '../domain/view/trackViews'
-import { startFeatureFlagContexts } from '../domain/contexts/featureFlagContext'
+// import { startFeatureFlagContexts } from '../domain/contexts/featureFlagContext'
 import { startCustomerDataTelemetry } from '../domain/startCustomerDataTelemetry'
 import type { PageStateHistory } from '../domain/contexts/pageStateHistory'
 import { startPageStateHistory } from '../domain/contexts/pageStateHistory'
@@ -95,10 +95,10 @@ export function startRum(
     lifeCycle.notify(LifeCycleEventType.RAW_ERROR_COLLECTED, { error })
     // addTelemetryDebug('Error reported to customer', { 'error.message': error.message })
   }
-  const featureFlagContexts = startFeatureFlagContexts(
-    lifeCycle,
-    customerDataTrackerManager.getOrCreateTracker(CustomerDataType.FeatureFlag)
-  )
+  // const featureFlagContexts = startFeatureFlagContexts(
+  //   lifeCycle,
+  //   customerDataTrackerManager.getOrCreateTracker(CustomerDataType.FeatureFlag)
+  // )
 
   const pageExitObservable = createPageExitObservable(configuration)
   const pageExitSubscription = pageExitObservable.subscribe((event) => {
@@ -167,7 +167,7 @@ export function startRum(
     domMutationObservable,
     windowOpenObservable,
     locationChangeObservable,
-    featureFlagContexts,
+    'featureFlagContexts',
     pageStateHistory,
     recorderApi,
     initialViewOptions
@@ -177,16 +177,16 @@ export function startRum(
   const { stop: stopResourceCollection } = startResourceCollection(lifeCycle, configuration, pageStateHistory)
   cleanupTasks.push(stopResourceCollection)
 
-  if (isExperimentalFeatureEnabled(ExperimentalFeature.LONG_ANIMATION_FRAME)) {
-    if (configuration.trackLongTasks) {
-      const { stop: stopLongAnimationFrameCollection } = startLongAnimationFrameCollection(lifeCycle, configuration)
-      cleanupTasks.push(stopLongAnimationFrameCollection)
-    }
-  } else {
+  // if (isExperimentalFeatureEnabled(ExperimentalFeature.LONG_ANIMATION_FRAME)) {
+  //   if (configuration.trackLongTasks) {
+  //     const { stop: stopLongAnimationFrameCollection } = startLongAnimationFrameCollection(lifeCycle, configuration)
+  //     cleanupTasks.push(stopLongAnimationFrameCollection)
+  //   }
+  // } else {
     startLongTaskCollection(lifeCycle, configuration)
-  }
+  // }
 
-  const { addError } = startErrorCollection(lifeCycle, configuration, pageStateHistory, featureFlagContexts)
+  const { addError } = startErrorCollection(lifeCycle, configuration, pageStateHistory, 'featureFlagContexts')
 
   startRequestCollection(lifeCycle, configuration, session)
 
@@ -203,7 +203,7 @@ export function startRum(
     addAction,
     addError,
     addTiming,
-    addFeatureFlagEvaluation: featureFlagContexts.addFeatureFlagEvaluation,
+    // addFeatureFlagEvaluation: featureFlagContexts.addFeatureFlagEvaluation,
     startView,
     setViewContext,
     setViewContextProperty,

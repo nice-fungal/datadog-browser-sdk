@@ -9,8 +9,8 @@ import {
   // canUseEventBridge,
   assign,
   round,
-  isExperimentalFeatureEnabled,
-  ExperimentalFeature,
+  // isExperimentalFeatureEnabled,
+  // ExperimentalFeature,
   getConnectivity,
 } from '@datadog/browser-core'
 import type { RumEventDomainContext } from '../domainContext.types'
@@ -94,11 +94,11 @@ export function startRumAssembly(
       {
         'resource.url': 'string',
       },
-      isExperimentalFeatureEnabled(ExperimentalFeature.WRITABLE_RESOURCE_GRAPHQL)
-        ? {
-            'resource.graphql': 'object',
-          }
-        : {},
+      // isExperimentalFeatureEnabled(ExperimentalFeature.WRITABLE_RESOURCE_GRAPHQL)
+      //   ? {
+      //       'resource.graphql': 'object',
+      //     }
+        /* : */ {},
       USER_CUSTOMIZABLE_FIELD_PATHS,
       VIEW_MODIFIABLE_FIELD_PATHS,
       ROOT_MODIFIABLE_FIELD_PATHS
@@ -192,13 +192,13 @@ export function startRumAssembly(
             session.sessionReplay === SessionReplayState.SAMPLED
         }
 
-        if (
-          // TODO: remove ff and should always add anonymous user id
-          isExperimentalFeatureEnabled(ExperimentalFeature.ANONYMOUS_USER_TRACKING) &&
-          !commonContext.user.anonymous_id
-        ) {
-          commonContext.user.anonymous_id = session.anonymousId
-        }
+        // if (
+        //   // TODO: remove ff and should always add anonymous user id
+        //   isExperimentalFeatureEnabled(ExperimentalFeature.ANONYMOUS_USER_TRACKING) &&
+        //   !commonContext.user.anonymous_id
+        // ) {
+        //   commonContext.user.anonymous_id = session.anonymousId
+        // }
         if (!isEmptyObject(commonContext.user)) {
           ;(serverRumEvent.usr as Mutable<RumEvent['usr']>) = commonContext.user as User & Context
         }

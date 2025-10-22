@@ -248,7 +248,7 @@ export interface RumPublicApi extends PublicApi {
    *
    * See [Feature Flag Tracking](https://docs.datadoghq.com/real_user_monitoring/feature_flag_tracking/) for further information.
    */
-  addFeatureFlagEvaluation: (key: string, value: any) => void
+  // addFeatureFlagEvaluation: (key: string, value: any) => void
 
   /**
    * Get the Session Replay Link.
@@ -354,7 +354,7 @@ export interface Strategy {
   setViewContextProperty: StartRumResult['setViewContextProperty']
   addAction: StartRumResult['addAction']
   addError: StartRumResult['addError']
-  addFeatureFlagEvaluation: StartRumResult['addFeatureFlagEvaluation']
+  // addFeatureFlagEvaluation: StartRumResult['addFeatureFlagEvaluation']
   startDurationVital: StartRumResult['startDurationVital']
   stopDurationVital: StartRumResult['stopDurationVital']
   addDurationVital: StartRumResult['addDurationVital']
@@ -532,10 +532,10 @@ export function makeRumPublicApi(
       // addTelemetryUsage({ feature: 'stop-session' })
     }),
 
-    addFeatureFlagEvaluation: monitor((key, value) => {
-      strategy.addFeatureFlagEvaluation(sanitize(key)!, sanitize(value))
-      // addTelemetryUsage({ feature: 'add-feature-flag-evaluation' })
-    }),
+    // addFeatureFlagEvaluation: monitor((key, value) => {
+    //   strategy.addFeatureFlagEvaluation(sanitize(key)!, sanitize(value))
+    //   // addTelemetryUsage({ feature: 'add-feature-flag-evaluation' })
+    // }),
 
     getSessionReplayLink: monitor(() => recorderApi.getSessionReplayLink()),
     startSessionReplayRecording: monitor((options?: StartRecordingOptions) => {

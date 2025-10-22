@@ -1,4 +1,4 @@
-import { ExperimentalFeature, isExperimentalFeatureEnabled } from '../../tools/experimentalFeatures'
+// import { ExperimentalFeature, isExperimentalFeatureEnabled } from '../../tools/experimentalFeatures'
 import { isEmptyObject } from '../../tools/utils/objectUtils'
 import { objectEntries } from '../../tools/utils/polyfills'
 import { dateNow } from '../../tools/utils/timeUtils'
@@ -20,13 +20,13 @@ export function getExpiredSessionState(previousSessionState: SessionState | unde
   const expiredSessionState: SessionState = {
     isExpired: EXPIRED,
   }
-  if (isExperimentalFeatureEnabled(ExperimentalFeature.ANONYMOUS_USER_TRACKING)) {
-    if (previousSessionState?.anonymousId) {
-      expiredSessionState.anonymousId = previousSessionState?.anonymousId
-    } else {
-      expiredSessionState.anonymousId = generateAnonymousId()
-    }
-  }
+  // if (isExperimentalFeatureEnabled(ExperimentalFeature.ANONYMOUS_USER_TRACKING)) {
+  //   if (previousSessionState?.anonymousId) {
+  //     expiredSessionState.anonymousId = previousSessionState?.anonymousId
+  //   } else {
+  //     expiredSessionState.anonymousId = generateAnonymousId()
+  //   }
+  // }
   return expiredSessionState
 }
 

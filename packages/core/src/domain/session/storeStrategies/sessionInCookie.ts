@@ -1,5 +1,5 @@
 import { isChromium } from '../../../tools/utils/browserDetection'
-import { ExperimentalFeature, isExperimentalFeatureEnabled } from '../../../tools/experimentalFeatures'
+// import { ExperimentalFeature, isExperimentalFeatureEnabled } from '../../../tools/experimentalFeatures'
 import type { CookieOptions } from '../../../browser/cookie'
 import { getCurrentSite, areCookiesAuthorized, getCookie, setCookie } from '../../../browser/cookie'
 import type { InitConfiguration } from '../../configuration'
@@ -48,9 +48,9 @@ function expireSessionCookie(options: CookieOptions, sessionState: SessionState)
   setCookie(
     SESSION_STORE_KEY,
     toSessionString(expiredSessionState),
-    isExperimentalFeatureEnabled(ExperimentalFeature.ANONYMOUS_USER_TRACKING)
-      ? SESSION_COOKIE_EXPIRATION_DELAY
-      : SESSION_TIME_OUT_DELAY,
+    // isExperimentalFeatureEnabled(ExperimentalFeature.ANONYMOUS_USER_TRACKING)
+      // ? SESSION_COOKIE_EXPIRATION_DELAY
+      /* : */ SESSION_TIME_OUT_DELAY,
     options
   )
 }

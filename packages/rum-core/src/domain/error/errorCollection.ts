@@ -36,7 +36,7 @@ export function startErrorCollection(
   lifeCycle: LifeCycle,
   configuration: RumConfiguration,
   pageStateHistory: PageStateHistory,
-  featureFlagContexts: FeatureFlagContexts
+  featureFlagContexts: string | FeatureFlagContexts
 ) {
   const errorObservable = new Observable<RawError>()
 
@@ -46,13 +46,13 @@ export function startErrorCollection(
 
   errorObservable.subscribe((error) => lifeCycle.notify(LifeCycleEventType.RAW_ERROR_COLLECTED, { error }))
 
-  return doStartErrorCollection(lifeCycle, pageStateHistory, featureFlagContexts)
+  return doStartErrorCollection(lifeCycle, pageStateHistory, 'featureFlagContexts')
 }
 
 export function doStartErrorCollection(
   lifeCycle: LifeCycle,
   pageStateHistory: PageStateHistory,
-  featureFlagContexts: FeatureFlagContexts
+  featureFlagContexts: string | FeatureFlagContexts
 ) {
   lifeCycle.subscribe(LifeCycleEventType.RAW_ERROR_COLLECTED, ({ error, customerContext, savedCommonContext }) => {
     lifeCycle.notify(
@@ -62,7 +62,7 @@ export function doStartErrorCollection(
           customerContext,
           savedCommonContext,
         },
-        processError(error, pageStateHistory, featureFlagContexts)
+        processError(error, pageStateHistory, 'featureFlagContexts')
       )
     )
   })
@@ -95,7 +95,7 @@ export function doStartErrorCollection(
 function processError(
   error: RawError,
   pageStateHistory: PageStateHistory,
-  featureFlagContexts: FeatureFlagContexts
+  featureFlagContexts: string | FeatureFlagContexts
 ): RawRumEventCollectedData<RawRumErrorEvent> {
   const rawRumEvent: RawRumErrorEvent = {
     date: error.startClocks.timeStamp,
@@ -116,10 +116,10 @@ function processError(
     view: { in_foreground: pageStateHistory.wasInPageStateAt(PageState.ACTIVE, error.startClocks.relative) },
   }
 
-  const featureFlagContext = featureFlagContexts.findFeatureFlagEvaluations(error.startClocks.relative)
-  if (featureFlagContext && !isEmptyObject(featureFlagContext)) {
-    rawRumEvent.feature_flags = featureFlagContext
-  }
+  // const featureFlagContext = featureFlagContexts.findFeatureFlagEvaluations(error.startClocks.relative)
+  // if (featureFlagContext && !isEmptyObject(featureFlagContext)) {
+  //   rawRumEvent.feature_flags = featureFlagContext
+  // }
 
   const domainContext: RumErrorEventDomainContext = {
     error: error.originalError,

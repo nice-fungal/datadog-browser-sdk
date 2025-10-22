@@ -8,7 +8,7 @@ import type { LifeCycle, RawRumEventCollectedData } from '../lifeCycle'
 import { LifeCycleEventType } from '../lifeCycle'
 import type { LocationChange } from '../../browser/locationChangeObservable'
 import type { RumConfiguration } from '../configuration'
-import type { FeatureFlagContexts } from '../contexts/featureFlagContext'
+// import type { FeatureFlagContexts } from '../contexts/featureFlagContext'
 import type { PageStateHistory } from '../contexts/pageStateHistory'
 import type { ViewEvent, ViewOptions } from './trackViews'
 import { trackViews } from './trackViews'
@@ -20,7 +20,7 @@ export function startViewCollection(
   domMutationObservable: Observable<void>,
   pageOpenObserable: Observable<void>,
   locationChangeObservable: Observable<LocationChange>,
-  featureFlagContexts: FeatureFlagContexts,
+  featureFlagContexts: string,
   pageStateHistory: PageStateHistory,
   recorderApi: RecorderApi,
   initialViewOptions?: ViewOptions
@@ -46,12 +46,12 @@ export function startViewCollection(
 function processViewUpdate(
   view: ViewEvent,
   configuration: RumConfiguration,
-  featureFlagContexts: FeatureFlagContexts,
+  featureFlagContexts: string,
   recorderApi: RecorderApi,
   pageStateHistory: PageStateHistory
 ): RawRumEventCollectedData<RawRumViewEvent> {
   const replayStats = recorderApi.getReplayStats(view.id)
-  const featureFlagContext = featureFlagContexts.findFeatureFlagEvaluations(view.startClocks.relative)
+  // const featureFlagContext = featureFlagContexts.findFeatureFlagEvaluations(view.startClocks.relative)
   const pageStates = pageStateHistory.findAll(view.startClocks.relative, view.duration)
   const viewEvent: RawRumViewEvent = {
     _dd: {
@@ -103,7 +103,7 @@ function processViewUpdate(
       },
       time_spent: toServerDuration(view.duration),
     },
-    feature_flags: featureFlagContext && !isEmptyObject(featureFlagContext) ? featureFlagContext : undefined,
+    // feature_flags: featureFlagContext && !isEmptyObject(featureFlagContext) ? featureFlagContext : undefined,
     display: view.commonViewMetrics.scroll
       ? {
           scroll: {
