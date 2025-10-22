@@ -12,7 +12,7 @@ import {
   ExperimentalFeature,
   isExperimentalFeatureEnabled,
   initFeatureFlags,
-  addTelemetryConfiguration,
+  // addTelemetryConfiguration,
   initFetchObservable,
 } from '@datadog/browser-core'
 import type { TrackingConsentState, DeflateWorker } from '@datadog/browser-core'
@@ -89,7 +89,7 @@ export function createPreStartStrategy(
 
     // Update the exposed initConfiguration to reflect the bridge and remote configuration overrides
     cachedInitConfiguration = initConfiguration
-    addTelemetryConfiguration(serializeRumConfiguration(initConfiguration))
+    // addTelemetryConfiguration(serializeRumConfiguration(initConfiguration))
 
     if (cachedConfiguration) {
       displayAlreadyInitializedError('DD_RUM', initConfiguration)

@@ -1,9 +1,9 @@
-import type { Context, CustomerDataTrackerManager, FlushEvent, Observable, Telemetry } from '@datadog/browser-core'
+import type { Context, CustomerDataTrackerManager, FlushEvent, Observable /*, Telemetry */ } from '@datadog/browser-core'
 import {
   includes,
   performDraw,
   ONE_SECOND,
-  addTelemetryDebug,
+  // addTelemetryDebug,
   setInterval,
   CustomerDataType,
 } from '@datadog/browser-core'
@@ -42,15 +42,15 @@ let batchHasRumEvent: boolean
 
 export function startCustomerDataTelemetry(
   configuration: RumConfiguration,
-  telemetry: Telemetry,
+  telemetry: string,
   lifeCycle: LifeCycle,
   customerDataTrackerManager: CustomerDataTrackerManager,
   batchFlushObservable: Observable<FlushEvent>
 ) {
-  const customerDataTelemetryEnabled = telemetry.enabled && performDraw(configuration.customerDataTelemetrySampleRate)
-  if (!customerDataTelemetryEnabled) {
-    return
-  }
+  // const customerDataTelemetryEnabled = telemetry.enabled && performDraw(configuration.customerDataTelemetrySampleRate)
+  // if (!customerDataTelemetryEnabled) {
+  //   return
+  // }
 
   initCurrentPeriodMeasures()
   initCurrentBatchMeasures()
@@ -100,7 +100,7 @@ function sendCurrentPeriodMeasures() {
     return
   }
 
-  addTelemetryDebug('Customer data measures', currentPeriodMeasures)
+  // addTelemetryDebug('Customer data measures', currentPeriodMeasures)
   initCurrentPeriodMeasures()
 }
 

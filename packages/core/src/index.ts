@@ -28,25 +28,25 @@ export { computeStackTrace, StackTrace } from './tools/stackTrace/computeStackTr
 export { defineGlobal, makePublicApi, PublicApi } from './boot/init'
 export { displayAlreadyInitializedError } from './boot/displayAlreadyInitializedError'
 export { initReportObservable, RawReportType } from './domain/report/reportObservable'
-export {
-  startTelemetry,
-  Telemetry,
-  RawTelemetryEvent,
-  RawTelemetryConfiguration,
-  addTelemetryDebug,
-  addTelemetryError,
-  startFakeTelemetry,
-  resetTelemetry,
-  TelemetryEvent,
-  TelemetryErrorEvent,
-  TelemetryDebugEvent,
-  TelemetryConfigurationEvent,
-  TelemetryService,
-  isTelemetryReplicationAllowed,
-  addTelemetryConfiguration,
-  addTelemetryUsage,
-  drainPreStartTelemetry,
-} from './domain/telemetry'
+// export {
+//   startTelemetry,
+//   Telemetry,
+//   RawTelemetryEvent,
+//   RawTelemetryConfiguration,
+//   addTelemetryDebug,
+//   addTelemetryError,
+//   startFakeTelemetry,
+//   resetTelemetry,
+//   TelemetryEvent,
+//   TelemetryErrorEvent,
+//   TelemetryDebugEvent,
+//   TelemetryConfigurationEvent,
+//   TelemetryService,
+//   isTelemetryReplicationAllowed,
+//   addTelemetryConfiguration,
+//   addTelemetryUsage,
+//   drainPreStartTelemetry,
+// } from './domain/telemetry'
 export { monitored, monitor, callMonitored, setDebugMode } from './tools/monitor'
 export { Observable, Subscription } from './tools/observable'
 export {

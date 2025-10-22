@@ -1,4 +1,4 @@
-import type { Configuration, InitConfiguration, RawTelemetryConfiguration } from '@datadog/browser-core'
+import type { Configuration, InitConfiguration /*, RawTelemetryConfiguration */ } from '@datadog/browser-core'
 import {
   serializeConfiguration,
   assign,
@@ -135,5 +135,5 @@ export function serializeLogsConfiguration(configuration: LogsInitConfiguration)
       send_logs_after_session_expiration: configuration.sendLogsAfterSessionExpiration,
     },
     baseSerializedInitConfiguration
-  ) satisfies RawTelemetryConfiguration
+  ) /* satisfies RawTelemetryConfiguration */
 }

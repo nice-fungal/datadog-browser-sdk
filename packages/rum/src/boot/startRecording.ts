@@ -1,5 +1,5 @@
 import type { RawError, HttpRequest, DeflateEncoder } from '@datadog/browser-core'
-import { createHttpRequest, addTelemetryDebug, canUseEventBridge } from '@datadog/browser-core'
+import { createHttpRequest, /* addTelemetryDebug, */ canUseEventBridge } from '@datadog/browser-core'
 import type { LifeCycle, ViewHistory, RumConfiguration, RumSessionManager } from '@datadog/browser-rum-core'
 import { LifeCycleEventType } from '@datadog/browser-rum-core'
 
@@ -20,7 +20,7 @@ export function startRecording(
 
   const reportError = (error: RawError) => {
     lifeCycle.notify(LifeCycleEventType.RAW_ERROR_COLLECTED, { error })
-    addTelemetryDebug('Error reported to customer', { 'error.message': error.message })
+    // addTelemetryDebug('Error reported to customer', { 'error.message': error.message })
   }
 
   const replayRequest =

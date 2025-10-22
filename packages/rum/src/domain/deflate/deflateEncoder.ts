@@ -6,7 +6,7 @@ import type {
   EncoderResult,
 } from '@datadog/browser-core'
 import type { RumConfiguration } from '@datadog/browser-rum-core'
-import { addEventListener, addTelemetryDebug, assign, concatBuffers } from '@datadog/browser-core'
+import { addEventListener, /* addTelemetryDebug, */ assign, concatBuffers } from '@datadog/browser-core'
 
 export function createDeflateEncoder(
   configuration: RumConfiguration,
@@ -47,7 +47,7 @@ export function createDeflateEncoder(
         }
       } else {
         removeMessageListener()
-        addTelemetryDebug('Worker responses received out of order.')
+        // addTelemetryDebug('Worker responses received out of order.')
       }
     }
   )

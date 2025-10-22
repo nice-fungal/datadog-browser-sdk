@@ -1,8 +1,8 @@
-import type { Context, TelemetryEvent, Observable, RawError, PageExitEvent, Encoder } from '@datadog/browser-core'
+import type { Context, /* TelemetryEvent, */ Observable, RawError, PageExitEvent, Encoder } from '@datadog/browser-core'
 import {
   DeflateEncoderStreamId,
   combine,
-  isTelemetryReplicationAllowed,
+  // isTelemetryReplicationAllowed,
   startBatchWithReplica,
 } from '@datadog/browser-core'
 import type { RumConfiguration } from '../domain/configuration'
@@ -14,7 +14,7 @@ import type { RumEvent } from '../rumEvent.types'
 export function startRumBatch(
   configuration: RumConfiguration,
   lifeCycle: LifeCycle,
-  telemetryEventObservable: Observable<TelemetryEvent & Context>,
+  telemetryEventObservable: string,
   reportError: (error: RawError) => void,
   pageExitObservable: Observable<PageExitEvent>,
   sessionExpireObservable: Observable<void>,
@@ -46,7 +46,7 @@ export function startRumBatch(
     }
   })
 
-  telemetryEventObservable.subscribe((event) => batch.add(event, isTelemetryReplicationAllowed(configuration)))
+  // telemetryEventObservable.subscribe((event) => batch.add(event, isTelemetryReplicationAllowed(configuration)))
 
   return batch
 }

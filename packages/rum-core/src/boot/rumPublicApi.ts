@@ -11,7 +11,7 @@ import type {
   Duration,
 } from '@datadog/browser-core'
 import {
-  addTelemetryUsage,
+  // addTelemetryUsage,
   CustomerDataType,
   assign,
   createContextManager,
@@ -428,7 +428,7 @@ export function makeRumPublicApi(
       customerDataTrackerManager.getOrCreateTracker(CustomerDataType.View).updateCustomerData(sanitizedOptions.context)
     }
     strategy.startView(sanitizedOptions)
-    addTelemetryUsage({ feature: 'start-view' })
+    // addTelemetryUsage({ feature: 'start-view' })
   })
 
   const rumPublicApi: RumPublicApi = makePublicApi<RumPublicApi>({
@@ -438,7 +438,7 @@ export function makeRumPublicApi(
 
     setTrackingConsent: monitor((trackingConsent) => {
       trackingConsentState.update(trackingConsent)
-      addTelemetryUsage({ feature: 'set-tracking-consent', tracking_consent: trackingConsent })
+      // addTelemetryUsage({ feature: 'set-tracking-consent', tracking_consent: trackingConsent })
     }),
 
     setViewName: monitor((name: string) => {
@@ -455,14 +455,14 @@ export function makeRumPublicApi(
 
     setGlobalContext: monitor((context) => {
       globalContextManager.setContext(context)
-      addTelemetryUsage({ feature: 'set-global-context' })
+      // addTelemetryUsage({ feature: 'set-global-context' })
     }),
 
     getGlobalContext: monitor(() => globalContextManager.getContext()),
 
     setGlobalContextProperty: monitor((key, value) => {
       globalContextManager.setContextProperty(key, value)
-      addTelemetryUsage({ feature: 'set-global-context' })
+      // addTelemetryUsage({ feature: 'set-global-context' })
     }),
 
     removeGlobalContextProperty: monitor((key) => globalContextManager.removeContextProperty(key)),
@@ -484,7 +484,7 @@ export function makeRumPublicApi(
           type: ActionType.CUSTOM,
           handlingStack,
         })
-        addTelemetryUsage({ feature: 'add-action' })
+        // addTelemetryUsage({ feature: 'add-action' })
       })
     },
 
@@ -497,7 +497,7 @@ export function makeRumPublicApi(
           context: sanitize(context) as Context,
           startClocks: clocksNow(),
         })
-        addTelemetryUsage({ feature: 'add-error' })
+        // addTelemetryUsage({ feature: 'add-error' })
       })
     },
 
@@ -510,7 +510,7 @@ export function makeRumPublicApi(
       if (checkUser(newUser)) {
         userContextManager.setContext(sanitizeUser(newUser as Context))
       }
-      addTelemetryUsage({ feature: 'set-user' })
+      // addTelemetryUsage({ feature: 'set-user' })
     }),
 
     getUser: monitor(() => userContextManager.getContext()),
@@ -518,7 +518,7 @@ export function makeRumPublicApi(
     setUserProperty: monitor((key, property) => {
       const sanitizedProperty = sanitizeUser({ [key]: property })[key]
       userContextManager.setContextProperty(key, sanitizedProperty)
-      addTelemetryUsage({ feature: 'set-user' })
+      // addTelemetryUsage({ feature: 'set-user' })
     }),
 
     removeUserProperty: monitor((key) => userContextManager.removeContextProperty(key)),
@@ -529,24 +529,24 @@ export function makeRumPublicApi(
 
     stopSession: monitor(() => {
       strategy.stopSession()
-      addTelemetryUsage({ feature: 'stop-session' })
+      // addTelemetryUsage({ feature: 'stop-session' })
     }),
 
     addFeatureFlagEvaluation: monitor((key, value) => {
       strategy.addFeatureFlagEvaluation(sanitize(key)!, sanitize(value))
-      addTelemetryUsage({ feature: 'add-feature-flag-evaluation' })
+      // addTelemetryUsage({ feature: 'add-feature-flag-evaluation' })
     }),
 
     getSessionReplayLink: monitor(() => recorderApi.getSessionReplayLink()),
     startSessionReplayRecording: monitor((options?: StartRecordingOptions) => {
       recorderApi.start(options)
-      addTelemetryUsage({ feature: 'start-session-replay-recording', force: options && options.force })
+      // addTelemetryUsage({ feature: 'start-session-replay-recording', force: options && options.force })
     }),
 
     stopSessionReplayRecording: monitor(() => recorderApi.stop()),
 
     addDurationVital: monitor((name, options) => {
-      addTelemetryUsage({ feature: 'add-duration-vital' })
+      // addTelemetryUsage({ feature: 'add-duration-vital' })
       strategy.addDurationVital({
         name: sanitize(name)!,
         type: VitalType.DURATION,
@@ -558,7 +558,7 @@ export function makeRumPublicApi(
     }),
 
     startDurationVital: monitor((name, options) => {
-      addTelemetryUsage({ feature: 'start-duration-vital' })
+      // addTelemetryUsage({ feature: 'start-duration-vital' })
       return strategy.startDurationVital(sanitize(name)!, {
         context: sanitize(options && options.context) as Context,
         description: sanitize(options && options.description) as string | undefined,
@@ -566,7 +566,7 @@ export function makeRumPublicApi(
     }),
 
     stopDurationVital: monitor((nameOrRef, options) => {
-      addTelemetryUsage({ feature: 'stop-duration-vital' })
+      // addTelemetryUsage({ feature: 'stop-duration-vital' })
       strategy.stopDurationVital(typeof nameOrRef === 'string' ? sanitize(nameOrRef)! : nameOrRef, {
         context: sanitize(options && options.context) as Context,
         description: sanitize(options && options.description) as string | undefined,

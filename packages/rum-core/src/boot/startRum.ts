@@ -1,6 +1,6 @@
 import type {
   Observable,
-  TelemetryEvent,
+  // TelemetryEvent,
   RawError,
   DeflateEncoderStreamId,
   Encoder,
@@ -10,13 +10,13 @@ import type {
 import {
   sendToExtension,
   createPageExitObservable,
-  TelemetryService,
-  startTelemetry,
+  // TelemetryService,
+  // startTelemetry,
   canUseEventBridge,
   getEventBridge,
-  addTelemetryDebug,
+  // addTelemetryDebug,
   CustomerDataType,
-  drainPreStartTelemetry,
+  // drainPreStartTelemetry,
   isExperimentalFeatureEnabled,
   ExperimentalFeature,
 } from '@datadog/browser-core'
@@ -75,25 +75,25 @@ export function startRum(
 
   lifeCycle.subscribe(LifeCycleEventType.RUM_EVENT_COLLECTED, (event) => sendToExtension('rum', event))
 
-  const telemetry = startRumTelemetry(configuration)
-  telemetry.setContextProvider(() => ({
-    application: {
-      id: configuration.applicationId,
-    },
-    session: {
-      id: session.findTrackedSession()?.id,
-    },
-    view: {
-      id: viewHistory.findView()?.id,
-    },
-    action: {
-      id: actionContexts.findActionId(),
-    },
-  }))
+  // const telemetry = startRumTelemetry(configuration)
+  // telemetry.setContextProvider(() => ({
+  //   application: {
+  //     id: configuration.applicationId,
+  //   },
+  //   session: {
+  //     id: session.findTrackedSession()?.id,
+  //   },
+  //   view: {
+  //     id: viewHistory.findView()?.id,
+  //   },
+  //   action: {
+  //     id: actionContexts.findActionId(),
+  //   },
+  // }))
 
   const reportError = (error: RawError) => {
     lifeCycle.notify(LifeCycleEventType.RAW_ERROR_COLLECTED, { error })
-    addTelemetryDebug('Error reported to customer', { 'error.message': error.message })
+    // addTelemetryDebug('Error reported to customer', { 'error.message': error.message })
   }
   const featureFlagContexts = startFeatureFlagContexts(
     lifeCycle,
@@ -113,14 +113,14 @@ export function startRum(
     const batch = startRumBatch(
       configuration,
       lifeCycle,
-      telemetry.observable,
+      'telemetry.observable',
       reportError,
       pageExitObservable,
       session.expireObservable,
       createEncoder
     )
     cleanupTasks.push(() => batch.stop())
-    startCustomerDataTelemetry(configuration, telemetry, lifeCycle, customerDataTrackerManager, batch.flushObservable)
+    startCustomerDataTelemetry(configuration, 'telemetry', lifeCycle, customerDataTrackerManager, batch.flushObservable)
   } else {
     startRumEventBridge(lifeCycle)
   }
@@ -151,7 +151,7 @@ export function startRum(
   )
   cleanupTasks.push(stopRumEventCollection)
 
-  drainPreStartTelemetry()
+  // drainPreStartTelemetry()
 
   const {
     addTiming,
@@ -222,14 +222,14 @@ export function startRum(
   }
 }
 
-function startRumTelemetry(configuration: RumConfiguration) {
-  const telemetry = startTelemetry(TelemetryService.RUM, configuration)
-  if (canUseEventBridge()) {
-    const bridge = getEventBridge<'internal_telemetry', TelemetryEvent>()!
-    telemetry.observable.subscribe((event) => bridge.send('internal_telemetry', event))
-  }
-  return telemetry
-}
+// function startRumTelemetry(configuration: RumConfiguration) {
+//   const telemetry = startTelemetry(TelemetryService.RUM, configuration)
+//   if (canUseEventBridge()) {
+//     const bridge = getEventBridge<'internal_telemetry', TelemetryEvent>()!
+//     telemetry.observable.subscribe((event) => bridge.send('internal_telemetry', event))
+//   }
+//   return telemetry
+// }
 
 export function startRumEventCollection(
   lifeCycle: LifeCycle,
