@@ -2,7 +2,7 @@ import type { TrackingConsentState } from '@datadog/browser-core'
 import {
   createBoundedBuffer,
   assign,
-  canUseEventBridge,
+  // canUseEventBridge,
   display,
   displayAlreadyInitializedError,
   initFeatureFlags,
@@ -49,9 +49,9 @@ export function createPreStartStrategy(
       // Set the experimental feature flags as early as possible, so we can use them in most places
       initFeatureFlags(initConfiguration.enableExperimentalFeatures)
 
-      if (canUseEventBridge()) {
-        initConfiguration = overrideInitConfigurationForBridge(initConfiguration)
-      }
+      // if (canUseEventBridge()) {
+      //   initConfiguration = overrideInitConfigurationForBridge(initConfiguration)
+      // }
 
       // Expose the initial configuration regardless of initialization success.
       cachedInitConfiguration = initConfiguration

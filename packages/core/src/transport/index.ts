@@ -1,6 +1,6 @@
 export { HttpRequest, createHttpRequest, Payload, RetryInfo } from './httpRequest'
 export {
-  canUseEventBridge,
+  // canUseEventBridge,
   bridgeSupports,
   getEventBridge,
   BridgeCapability,

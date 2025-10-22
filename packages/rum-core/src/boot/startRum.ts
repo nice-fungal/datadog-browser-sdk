@@ -12,7 +12,7 @@ import {
   createPageExitObservable,
   // TelemetryService,
   // startTelemetry,
-  canUseEventBridge,
+  // canUseEventBridge,
   getEventBridge,
   // addTelemetryDebug,
   CustomerDataType,
@@ -35,7 +35,7 @@ import { startViewCollection } from '../domain/view/viewCollection'
 import type { RumSessionManager } from '../domain/rumSessionManager'
 import { startRumSessionManager, startRumSessionManagerStub } from '../domain/rumSessionManager'
 import { startRumBatch } from '../transport/startRumBatch'
-import { startRumEventBridge } from '../transport/startRumEventBridge'
+// import { startRumEventBridge } from '../transport/startRumEventBridge'
 import { startUrlContexts } from '../domain/contexts/urlContexts'
 import type { LocationChange } from '../browser/locationChangeObservable'
 import { createLocationChangeObservable } from '../browser/locationChangeObservable'
@@ -106,10 +106,10 @@ export function startRum(
   })
   cleanupTasks.push(() => pageExitSubscription.unsubscribe())
 
-  const session = !canUseEventBridge()
-    ? startRumSessionManager(configuration, lifeCycle, trackingConsentState)
-    : startRumSessionManagerStub()
-  if (!canUseEventBridge()) {
+  const session = /* !canUseEventBridge() */
+    /* ? */ startRumSessionManager(configuration, lifeCycle, trackingConsentState)
+    // : startRumSessionManagerStub()
+  // if (!canUseEventBridge()) {
     const batch = startRumBatch(
       configuration,
       lifeCycle,
@@ -121,9 +121,9 @@ export function startRum(
     )
     cleanupTasks.push(() => batch.stop())
     startCustomerDataTelemetry(configuration, 'telemetry', lifeCycle, customerDataTrackerManager, batch.flushObservable)
-  } else {
-    startRumEventBridge(lifeCycle)
-  }
+  // } else {
+  //   startRumEventBridge(lifeCycle)
+  // }
 
   const domMutationObservable = createDOMMutationObservable()
   const locationChangeObservable = createLocationChangeObservable(configuration, location)

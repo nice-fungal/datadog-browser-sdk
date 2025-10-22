@@ -1,7 +1,7 @@
 import {
   createBoundedBuffer,
   display,
-  canUseEventBridge,
+  // canUseEventBridge,
   displayAlreadyInitializedError,
   willSyntheticsInjectRum,
   noop,
@@ -82,10 +82,10 @@ export function createPreStartStrategy(
   }
 
   function doInit(initConfiguration: RumInitConfiguration) {
-    const eventBridgeAvailable = canUseEventBridge()
-    if (eventBridgeAvailable) {
-      initConfiguration = overrideInitConfigurationForBridge(initConfiguration)
-    }
+    // const eventBridgeAvailable = canUseEventBridge()
+    // if (eventBridgeAvailable) {
+    //   initConfiguration = overrideInitConfigurationForBridge(initConfiguration)
+    // }
 
     // Update the exposed initConfiguration to reflect the bridge and remote configuration overrides
     cachedInitConfiguration = initConfiguration
@@ -101,12 +101,12 @@ export function createPreStartStrategy(
       return
     }
 
-    if (!eventBridgeAvailable && !configuration.sessionStoreStrategyType) {
+    if (/* !eventBridgeAvailable && */ !configuration.sessionStoreStrategyType) {
       display.warn('No storage available for session. We will not send any data.')
       return
     }
 
-    if (configuration.compressIntakeRequests && !eventBridgeAvailable && startDeflateWorker) {
+    if (configuration.compressIntakeRequests /* && !eventBridgeAvailable */ && startDeflateWorker) {
       deflateWorker = startDeflateWorker(
         configuration,
         'Datadog RUM',
@@ -228,11 +228,11 @@ export function createPreStartStrategy(
   }
 }
 
-function overrideInitConfigurationForBridge(initConfiguration: RumInitConfiguration): RumInitConfiguration {
-  return assign({}, initConfiguration, {
-    applicationId: '00000000-aaaa-0000-aaaa-000000000000',
-    clientToken: 'empty',
-    sessionSampleRate: 100,
-    defaultPrivacyLevel: initConfiguration.defaultPrivacyLevel ?? getEventBridge()?.getPrivacyLevel(),
-  })
-}
+// function overrideInitConfigurationForBridge(initConfiguration: RumInitConfiguration): RumInitConfiguration {
+//   return assign({}, initConfiguration, {
+//     applicationId: '00000000-aaaa-0000-aaaa-000000000000',
+//     clientToken: 'empty',
+//     sessionSampleRate: 100,
+//     defaultPrivacyLevel: initConfiguration.defaultPrivacyLevel ?? getEventBridge()?.getPrivacyLevel(),
+//   })
+// }

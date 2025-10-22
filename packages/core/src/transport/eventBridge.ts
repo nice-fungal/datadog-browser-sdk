@@ -1,4 +1,4 @@
-import { endsWith, includes } from '../tools/utils/polyfills'
+// import { endsWith, includes } from '../tools/utils/polyfills'
 import { getGlobalObject } from '../tools/getGlobalObject'
 import type { DefaultPrivacyLevel } from '../domain/configuration'
 
@@ -18,42 +18,45 @@ export const enum BridgeCapability {
 }
 
 export function getEventBridge<T, E>() {
-  const eventBridgeGlobal = getEventBridgeGlobal()
+  // const eventBridgeGlobal = getEventBridgeGlobal()
 
-  if (!eventBridgeGlobal) {
-    return
-  }
+  // if (!eventBridgeGlobal) {
+  //   return
+  // }
 
-  return {
-    getCapabilities() {
-      return JSON.parse(eventBridgeGlobal.getCapabilities?.() || '[]') as BridgeCapability[]
-    },
-    getPrivacyLevel() {
-      return eventBridgeGlobal.getPrivacyLevel?.()
-    },
-    getAllowedWebViewHosts() {
-      return JSON.parse(eventBridgeGlobal.getAllowedWebViewHosts()) as string[]
-    },
-    send(eventType: T, event: E, viewId?: string) {
-      const view = viewId ? { id: viewId } : undefined
-      eventBridgeGlobal.send(JSON.stringify({ eventType, event, view }))
-    },
-  }
+  // return {
+  //   getCapabilities() {
+  //     return JSON.parse(eventBridgeGlobal.getCapabilities?.() || '[]') as BridgeCapability[]
+  //   },
+  //   getPrivacyLevel() {
+  //     return eventBridgeGlobal.getPrivacyLevel?.()
+  //   },
+  //   getAllowedWebViewHosts() {
+  //     return JSON.parse(eventBridgeGlobal.getAllowedWebViewHosts()) as string[]
+  //   },
+  //   send(eventType: T, event: E, viewId?: string) {
+  //     const view = viewId ? { id: viewId } : undefined
+  //     eventBridgeGlobal.send(JSON.stringify({ eventType, event, view }))
+  //   },
+  // }
+  return null;
 }
 
 export function bridgeSupports(capability: BridgeCapability): boolean {
-  const bridge = getEventBridge()
-  return !!bridge && includes(bridge.getCapabilities(), capability)
+  // const bridge = getEventBridge()
+  // return !!bridge && includes(bridge.getCapabilities(), capability)
+  return false
 }
 
 export function canUseEventBridge(currentHost = getGlobalObject<Window>().location?.hostname): boolean {
-  const bridge = getEventBridge()
-  return (
-    !!bridge &&
-    bridge
-      .getAllowedWebViewHosts()
-      .some((allowedHost) => currentHost === allowedHost || endsWith(currentHost, `.${allowedHost}`))
-  )
+  // const bridge = getEventBridge()
+  // return (
+  //   !!bridge &&
+  //   bridge
+  //     .getAllowedWebViewHosts()
+  //     .some((allowedHost) => currentHost === allowedHost || endsWith(currentHost, `.${allowedHost}`))
+  // )
+  return false
 }
 
 function getEventBridgeGlobal() {
