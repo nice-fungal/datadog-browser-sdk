@@ -50,7 +50,7 @@ export interface RumInitConfiguration extends InitConfiguration {
    * See [Content Security Policy guidelines](https://docs.datadoghq.com/integrations/content_security_policy_logs/?tab=firefox#use-csp-with-real-user-monitoring-and-session-replay) for further information.
    */
   compressIntakeRequests?: boolean | undefined
-  remoteConfigurationId?: string | undefined
+  // remoteConfigurationId?: string | undefined
 
   // tracing options
   /**

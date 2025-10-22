@@ -24,7 +24,7 @@ import type { CommonContext } from '../domain/contexts/commonContext'
 import type { ViewOptions } from '../domain/view/trackViews'
 import type { DurationVital, CustomVitalsState } from '../domain/vital/vitalCollection'
 import { startDurationVital, stopDurationVital } from '../domain/vital/vitalCollection'
-import { fetchAndApplyRemoteConfiguration, serializeRumConfiguration } from '../domain/configuration'
+import { /* fetchAndApplyRemoteConfiguration, */ serializeRumConfiguration } from '../domain/configuration'
 import { callPluginsMethod } from '../domain/plugins'
 import type { RumPublicApiOptions, Strategy } from './rumPublicApi'
 import type { StartRumResult } from './startRum'
@@ -159,14 +159,14 @@ export function createPreStartStrategy(
 
       callPluginsMethod(initConfiguration.plugins, 'onInit', { initConfiguration, publicApi })
 
-      if (
-        initConfiguration.remoteConfigurationId &&
-        isExperimentalFeatureEnabled(ExperimentalFeature.REMOTE_CONFIGURATION)
-      ) {
-        fetchAndApplyRemoteConfiguration(initConfiguration, doInit)
-      } else {
+      // if (
+      //   initConfiguration.remoteConfigurationId &&
+      //   isExperimentalFeatureEnabled(ExperimentalFeature.REMOTE_CONFIGURATION)
+      // ) {
+      //   fetchAndApplyRemoteConfiguration(initConfiguration, doInit)
+      // } else {
         doInit(initConfiguration)
-      }
+      // }
     },
 
     get initConfiguration() {
