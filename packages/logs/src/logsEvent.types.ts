@@ -26,7 +26,7 @@ export interface LogsEvent {
   /**
    * UUID of the session (deprecated in favor of session.id)
    */
-  session_id?: string
+  // session_id?: string
   /**
    * Session properties
    */

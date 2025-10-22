@@ -16,7 +16,7 @@ export const EXHAUSTIVE_INIT_CONFIGURATION: Required<InitConfiguration> = {
   telemetrySampleRate: 60,
   silentMultipleInit: true,
   sessionPersistence: 'cookie',
-  allowFallbackToLocalStorage: true,
+  // allowFallbackToLocalStorage: true,
   allowUntrustedEvents: true,
   storeContextsAcrossPages: true,
   trackingConsent: 'not-granted',

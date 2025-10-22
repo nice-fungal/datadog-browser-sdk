@@ -61,7 +61,7 @@ export interface InitConfiguration {
    * See [Monitor Electron Applications Using the Browser SDK](https://docs.datadoghq.com/real_user_monitoring/guide/monitor-electron-applications-using-browser-sdk) for further information.
    * @deprecated use `sessionPersistence: local-storage` where you want to use localStorage instead
    */
-  allowFallbackToLocalStorage?: boolean | undefined
+  // allowFallbackToLocalStorage?: boolean | undefined
 
   /**
    * Allow listening to DOM events dispatched programmatically ([untrusted events](https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted)). Enabling this option can be useful if you heavily rely on programmatic events, such as in an automated UI test environment.
@@ -302,7 +302,7 @@ export function serializeConfiguration(initConfiguration: InitConfiguration) {
     track_session_across_subdomains: initConfiguration.trackSessionAcrossSubdomains,
     track_anonymous_user: initConfiguration.trackAnonymousUser,
     session_persistence: initConfiguration.sessionPersistence,
-    allow_fallback_to_local_storage: !!initConfiguration.allowFallbackToLocalStorage,
+    // allow_fallback_to_local_storage: !!initConfiguration.allowFallbackToLocalStorage,
     store_contexts_across_pages: !!initConfiguration.storeContextsAcrossPages,
     allow_untrusted_events: !!initConfiguration.allowUntrustedEvents,
     tracking_consent: initConfiguration.trackingConsent,
