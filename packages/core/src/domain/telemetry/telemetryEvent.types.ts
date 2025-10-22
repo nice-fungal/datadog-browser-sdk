@@ -116,11 +116,11 @@ export type TelemetryConfigurationEvent = CommonTelemetryProperties & {
       /**
        * The percentage of sessions with Browser RUM & Session Replay pricing tracked (deprecated in favor of session_replay_sample_rate)
        */
-      premium_sample_rate?: number
+      // premium_sample_rate?: number
       /**
        * The percentage of sessions with Browser RUM & Session Replay pricing tracked (deprecated in favor of session_replay_sample_rate)
        */
-      replay_sample_rate?: number
+      // replay_sample_rate?: number
       /**
        * The percentage of sessions with RUM & Session Replay pricing tracked
        */
@@ -164,7 +164,7 @@ export type TelemetryConfigurationEvent = CommonTelemetryProperties & {
       /**
        * Whether a secure cross-site session cookie is used (deprecated)
        */
-      use_cross_site_session_cookie?: boolean
+      // use_cross_site_session_cookie?: boolean
       /**
        * Whether a partitioned secure cross-site session cookie is used
        */
@@ -176,7 +176,7 @@ export type TelemetryConfigurationEvent = CommonTelemetryProperties & {
       /**
        * Whether it is allowed to use LocalStorage when cookies are not available (deprecated in favor of session_persistence)
        */
-      allow_fallback_to_local_storage?: boolean
+      // allow_fallback_to_local_storage?: boolean
       /**
        * Configure the storage strategy for persisting sessions
        */
@@ -196,7 +196,7 @@ export type TelemetryConfigurationEvent = CommonTelemetryProperties & {
       /**
        * Whether the allowed tracing origins list is used (deprecated in favor of use_allowed_tracing_urls)
        */
-      use_allowed_tracing_origins?: boolean
+      // use_allowed_tracing_origins?: boolean
       /**
        * Whether the allowed tracing urls list is used
        */
@@ -248,7 +248,7 @@ export type TelemetryConfigurationEvent = CommonTelemetryProperties & {
       /**
        * Whether user actions are tracked (deprecated in favor of track_user_interactions)
        */
-      track_interactions?: boolean
+      // track_interactions?: boolean
       /**
        * Whether user actions are tracked
        */
