@@ -3,7 +3,7 @@ import { ExperimentalFeature, isExperimentalFeatureEnabled } from '../../../tool
 import type { CookieOptions } from '../../../browser/cookie'
 import { getCurrentSite, areCookiesAuthorized, getCookie, setCookie } from '../../../browser/cookie'
 import type { InitConfiguration } from '../../configuration'
-import { tryOldCookiesMigration } from '../oldCookiesMigration'
+// import { tryOldCookiesMigration } from '../oldCookiesMigration'
 import {
   SESSION_COOKIE_EXPIRATION_DELAY,
   SESSION_EXPIRATION_DELAY,
@@ -32,7 +32,7 @@ export function initCookieStrategy(cookieOptions: CookieOptions): SessionStoreSt
     expireSession: (sessionState: SessionState) => expireSessionCookie(cookieOptions, sessionState),
   }
 
-  tryOldCookiesMigration(cookieStore)
+  // tryOldCookiesMigration(cookieStore)
 
   return cookieStore
 }
@@ -64,12 +64,11 @@ function retrieveSessionCookie(): SessionState {
 export function buildCookieOptions(initConfiguration: InitConfiguration) {
   const cookieOptions: CookieOptions = {}
 
-  cookieOptions.secure =
-    !!initConfiguration.useSecureSessionCookie ||
-    !!initConfiguration.usePartitionedCrossSiteSessionCookie ||
-    !!initConfiguration.useCrossSiteSessionCookie
-  cookieOptions.crossSite =
-    !!initConfiguration.usePartitionedCrossSiteSessionCookie || !!initConfiguration.useCrossSiteSessionCookie
+  cookieOptions.secure = !!initConfiguration.useSecureSessionCookie
+                      || !!initConfiguration.usePartitionedCrossSiteSessionCookie
+                      // || !!initConfiguration.useCrossSiteSessionCookie
+  cookieOptions.crossSite = !!initConfiguration.usePartitionedCrossSiteSessionCookie
+                      // || !!initConfiguration.useCrossSiteSessionCookie
   cookieOptions.partitioned = !!initConfiguration.usePartitionedCrossSiteSessionCookie
 
   if (initConfiguration.trackSessionAcrossSubdomains) {

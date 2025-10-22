@@ -55,7 +55,7 @@ export function selectSessionStoreStrategyType(
 
     case undefined: {
       let sessionStoreStrategyType = selectCookieStrategy(initConfiguration)
-      if (!sessionStoreStrategyType && initConfiguration.allowFallbackToLocalStorage) {
+      if (!sessionStoreStrategyType /* && initConfiguration.allowFallbackToLocalStorage */) {
         sessionStoreStrategyType = selectLocalStorageStrategy()
       }
       return sessionStoreStrategyType

@@ -858,51 +858,51 @@ export type RumViewEvent = CommonProperties &
       /**
        * Duration in ns to the first rendering (deprecated in favor of `view.performance.fcp.timestamp`)
        */
-      readonly first_contentful_paint?: number
+      // readonly first_contentful_paint?: number
       /**
        * Duration in ns to the largest contentful paint (deprecated in favor of `view.performance.lcp.timestamp`)
        */
-      readonly largest_contentful_paint?: number
+      // readonly largest_contentful_paint?: number
       /**
        * CSS selector path of the largest contentful paint element (deprecated in favor of `view.performance.lcp.target_selector`)
        */
-      readonly largest_contentful_paint_target_selector?: string
+      // readonly largest_contentful_paint_target_selector?: string
       /**
        * Duration in ns of the first input event delay (deprecated in favor of `view.performance.fid.duration`)
        */
-      readonly first_input_delay?: number
+      // readonly first_input_delay?: number
       /**
        * Duration in ns to the first input (deprecated in favor of `view.performance.fid.timestamp`)
        */
-      readonly first_input_time?: number
+      // readonly first_input_time?: number
       /**
        * CSS selector path of the first input target element (deprecated in favor of `view.performance.fid.target_selector`)
        */
-      readonly first_input_target_selector?: string
+      // readonly first_input_target_selector?: string
       /**
        * Longest duration in ns between an interaction and the next paint (deprecated in favor of `view.performance.inp.duration`)
        */
-      readonly interaction_to_next_paint?: number
+      // readonly interaction_to_next_paint?: number
       /**
        * Duration in ns between start of the view and start of the INP (deprecated in favor of `view.performance.inp.timestamp`)
        */
-      readonly interaction_to_next_paint_time?: number
+      // readonly interaction_to_next_paint_time?: number
       /**
        * CSS selector path of the interacted element corresponding to INP (deprecated in favor of `view.performance.inp.target_selector`)
        */
-      readonly interaction_to_next_paint_target_selector?: string
+      // readonly interaction_to_next_paint_target_selector?: string
       /**
        * Total layout shift score that occurred on the view (deprecated in favor of `view.performance.cls.score`)
        */
-      readonly cumulative_layout_shift?: number
+      // readonly cumulative_layout_shift?: number
       /**
        * Duration in ns between start of the view and start of the largest layout shift contributing to CLS (deprecated in favor of `view.performance.cls.timestamp`)
        */
-      readonly cumulative_layout_shift_time?: number
+      // readonly cumulative_layout_shift_time?: number
       /**
        * CSS selector path of the first element (in document order) of the largest layout shift contributing to CLS (deprecated in favor of `view.performance.cls.target_selector`)
        */
-      readonly cumulative_layout_shift_target_selector?: string
+      // readonly cumulative_layout_shift_target_selector?: string
       /**
        * Duration in ns to the complete parsing and loading of the document and its sub resources
        */
@@ -1496,7 +1496,7 @@ export interface CommonProperties {
       /**
        * Session plan: 1 is the plan without replay, 2 is the plan with replay (deprecated)
        */
-      plan?: 1 | 2
+      // plan?: 1 | 2
       /**
        * The precondition that led to the creation of the session
        */

@@ -61,7 +61,7 @@ export interface InitConfiguration {
    * See [Monitor Electron Applications Using the Browser SDK](https://docs.datadoghq.com/real_user_monitoring/guide/monitor-electron-applications-using-browser-sdk) for further information.
    * @deprecated use `sessionPersistence: local-storage` where you want to use localStorage instead
    */
-  allowFallbackToLocalStorage?: boolean | undefined
+  // allowFallbackToLocalStorage?: boolean | undefined
 
   /**
    * Allow listening to DOM events dispatched programmatically ([untrusted events](https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted)). Enabling this option can be useful if you heavily rely on programmatic events, such as in an automated UI test environment.
@@ -113,7 +113,7 @@ export interface InitConfiguration {
    * @default false
    * @deprecated use usePartitionedCrossSiteSessionCookie instead
    */
-  useCrossSiteSessionCookie?: boolean | undefined
+  // useCrossSiteSessionCookie?: boolean | undefined
   /**
    * Use a partitioned secure cross-site session cookie. This allows the RUM Browser SDK to run when the site is loaded from another one (iframe). Implies `useSecureSessionCookie`.
    * @default false
@@ -297,14 +297,14 @@ export function serializeConfiguration(initConfiguration: InitConfiguration) {
     telemetry_configuration_sample_rate: initConfiguration.telemetryConfigurationSampleRate,
     telemetry_usage_sample_rate: initConfiguration.telemetryUsageSampleRate,
     use_before_send: !!initConfiguration.beforeSend,
-    use_cross_site_session_cookie: initConfiguration.useCrossSiteSessionCookie,
+    // use_cross_site_session_cookie: initConfiguration.useCrossSiteSessionCookie,
     use_partitioned_cross_site_session_cookie: initConfiguration.usePartitionedCrossSiteSessionCookie,
     use_secure_session_cookie: initConfiguration.useSecureSessionCookie,
     use_proxy: !!initConfiguration.proxy,
     silent_multiple_init: initConfiguration.silentMultipleInit,
     track_session_across_subdomains: initConfiguration.trackSessionAcrossSubdomains,
     session_persistence: initConfiguration.sessionPersistence,
-    allow_fallback_to_local_storage: !!initConfiguration.allowFallbackToLocalStorage,
+    // allow_fallback_to_local_storage: !!initConfiguration.allowFallbackToLocalStorage,
     store_contexts_across_pages: !!initConfiguration.storeContextsAcrossPages,
     allow_untrusted_events: !!initConfiguration.allowUntrustedEvents,
     tracking_consent: initConfiguration.trackingConsent,
