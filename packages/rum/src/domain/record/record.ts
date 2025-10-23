@@ -1,4 +1,4 @@
-import { sendToExtension } from '@datadog/browser-core'
+// import { sendToExtension } from '@datadog/browser-core'
 import type { LifeCycle, RumConfiguration, ViewHistory } from '@datadog/browser-rum-core'
 import type { BrowserRecord } from '../../types'
 import * as replayStats from '../replayStats'
@@ -45,7 +45,7 @@ export function record(options: RecordOptions): RecordAPI {
 
   const emitAndComputeStats = (record: BrowserRecord) => {
     emit(record)
-    sendToExtension('record', { record })
+    // sendToExtension('record', { record })
     const view = options.viewHistory.findView()!
     replayStats.addRecord(view.id)
   }

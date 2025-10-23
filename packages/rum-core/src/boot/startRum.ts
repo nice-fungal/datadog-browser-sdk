@@ -8,7 +8,7 @@ import type {
   TrackingConsentState,
 } from '@datadog/browser-core'
 import {
-  sendToExtension,
+  // sendToExtension,
   createPageExitObservable,
   // TelemetryService,
   // startTelemetry,
@@ -73,7 +73,7 @@ export function startRum(
   const cleanupTasks: Array<() => void> = []
   const lifeCycle = new LifeCycle()
 
-  lifeCycle.subscribe(LifeCycleEventType.RUM_EVENT_COLLECTED, (event) => sendToExtension('rum', event))
+  // lifeCycle.subscribe(LifeCycleEventType.RUM_EVENT_COLLECTED, (event) => sendToExtension('rum', event))
 
   // const telemetry = startRumTelemetry(configuration)
   // telemetry.setContextProvider(() => ({
