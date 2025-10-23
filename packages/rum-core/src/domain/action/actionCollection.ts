@@ -18,7 +18,7 @@ import type { PageStateHistory } from '../contexts/pageStateHistory'
 import { PageState } from '../contexts/pageStateHistory'
 import type { RumActionEventDomainContext } from '../../domainContext.types'
 import type { ActionContexts, ClickAction } from './trackClickActions'
-import { trackClickActions } from './trackClickActions'
+// import { trackClickActions } from './trackClickActions'
 
 export type { ActionContexts }
 
@@ -46,14 +46,14 @@ export function startActionCollection(
   let actionContexts: ActionContexts = { findActionId: noop as () => undefined }
   let stop: () => void = noop
 
-  if (configuration.trackUserInteractions) {
-    ;({ actionContexts, stop } = trackClickActions(
-      lifeCycle,
-      domMutationObservable,
-      windowOpenObservable,
-      configuration
-    ))
-  }
+  // if (configuration.trackUserInteractions) {
+  //   ;({ actionContexts, stop } = trackClickActions(
+  //     lifeCycle,
+  //     domMutationObservable,
+  //     windowOpenObservable,
+  //     configuration
+  //   ))
+  // }
 
   return {
     addAction: (action: CustomAction, savedCommonContext?: CommonContext) => {
