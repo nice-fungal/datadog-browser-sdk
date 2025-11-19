@@ -8,9 +8,9 @@ import {
   timeStampNow,
   clocksNow,
   getEventBridge,
-  ExperimentalFeature,
-  isExperimentalFeatureEnabled,
-  initFeatureFlags,
+  // ExperimentalFeature,
+  // isExperimentalFeatureEnabled,
+  // initFeatureFlags,
   // addTelemetryConfiguration,
   initFetchObservable,
 } from '@datadog/browser-core'
@@ -144,7 +144,7 @@ export function createPreStartStrategy(
         return
       }
       // Set the experimental feature flags as early as possible, so we can use them in most places
-      initFeatureFlags(initConfiguration.enableExperimentalFeatures)
+      // initFeatureFlags(initConfiguration.enableExperimentalFeatures)
 
       // Expose the initial configuration regardless of initialization success.
       cachedInitConfiguration = initConfiguration
@@ -215,9 +215,9 @@ export function createPreStartStrategy(
       bufferApiCalls.add((startRumResult) => startRumResult.addError(providedError, commonContext))
     },
 
-    addFeatureFlagEvaluation(key, value) {
-      bufferApiCalls.add((startRumResult) => startRumResult.addFeatureFlagEvaluation(key, value))
-    },
+    // addFeatureFlagEvaluation(key, value) {
+    //   bufferApiCalls.add((startRumResult) => startRumResult.addFeatureFlagEvaluation(key, value))
+    // },
 
     startDurationVital(name, options) {
       return startDurationVital(customVitalsState, name, options)
