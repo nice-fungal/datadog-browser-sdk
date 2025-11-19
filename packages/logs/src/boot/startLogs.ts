@@ -3,7 +3,7 @@ import {
   sendToExtension,
   createPageExitObservable,
   willSyntheticsInjectRum,
-  canUseEventBridge,
+  // canUseEventBridge,
 } from '@datadog/browser-core'
 import { startLogsSessionManager, startLogsSessionManagerStub } from '../domain/logsSessionManager'
 import type { LogsConfiguration, LogsInitConfiguration } from '../domain/configuration'
@@ -15,7 +15,7 @@ import { startRuntimeErrorCollection } from '../domain/runtimeError/runtimeError
 import { LifeCycle, LifeCycleEventType } from '../domain/lifeCycle'
 import { startLoggerCollection } from '../domain/logger/loggerCollection'
 import { startLogsBatch } from '../transport/startLogsBatch'
-import { startLogsBridge } from '../transport/startLogsBridge'
+// import { startLogsBridge } from '../transport/startLogsBridge'
 import { startInternalContext } from '../domain/contexts/internalContext'
 import { startReportError } from '../domain/reportError'
 import { startLogsTelemetry } from '../domain/logsTelemetry'
@@ -43,7 +43,7 @@ export function startLogs(
   const pageExitObservable = createPageExitObservable(configuration)
 
   const session =
-    configuration.sessionStoreStrategyType && !canUseEventBridge() && !willSyntheticsInjectRum()
+    configuration.sessionStoreStrategyType /* && !canUseEventBridge() */ && !willSyntheticsInjectRum()
       ? startLogsSessionManager(configuration, trackingConsentState)
       : startLogsSessionManagerStub(configuration)
 
@@ -64,12 +64,12 @@ export function startLogs(
 
   startLogsAssembly(session, configuration, lifeCycle, getCommonContext, reportError)
 
-  if (!canUseEventBridge()) {
+  // if (!canUseEventBridge()) {
     const { stop: stopLogsBatch } = startLogsBatch(configuration, lifeCycle, reportError, pageExitObservable, session)
     cleanupTasks.push(() => stopLogsBatch())
-  } else {
-    startLogsBridge(lifeCycle)
-  }
+  // } else {
+  //   startLogsBridge(lifeCycle)
+  // }
 
   const internalContext = startInternalContext(session)
 

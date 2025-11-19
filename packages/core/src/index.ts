@@ -64,7 +64,7 @@ export {
   HttpRequest,
   Payload,
   createHttpRequest,
-  canUseEventBridge,
+  // canUseEventBridge,
   getEventBridge,
   bridgeSupports,
   BridgeCapability,
