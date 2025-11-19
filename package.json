@@ -10,6 +10,9 @@
   "scripts": {
     "postinstall": "scripts/cli init_submodule",
     "build": "lerna run build --stream",
+    "build:core": "lerna run build --scope @datadog/browser-core",
+    "build:rum-core": "lerna run build --scope @datadog/browser-rum-core",
+    "build:rum-slim": "lerna run build --scope @datadog/browser-rum-slim",
     "build:bundle": "lerna run build:bundle --stream",
     "format": "prettier --check .",
     "lint": "scripts/cli lint .",
