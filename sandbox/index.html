@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>Sandbox</title>
-    <script src="http://localhost:8080/datadog-rum.js"></script>
-    <script src="http://localhost:8080/datadog-logs.js"></script>
+    <script src="http://localhost:8000/datadog-rum-slim.js"></script>
+    <!-- <script src="http://localhost:8080/datadog-logs.js"></script> -->
     <script>
       DD_RUM.init({
         clientToken: 'xxx',
@@ -17,13 +17,13 @@
         telemetryUsageSampleRate: 100,
         enableExperimentalFeatures: [],
       })
-      DD_LOGS.init({
-        clientToken: 'xxx',
-        telemetrySampleRate: 100,
-        telemetryConfigurationSampleRate: 100,
-        telemetryUsageSampleRate: 100,
-        enableExperimentalFeatures: [],
-      })
+      // DD_LOGS.init({
+      //   clientToken: 'xxx',
+      //   telemetrySampleRate: 100,
+      //   telemetryConfigurationSampleRate: 100,
+      //   telemetryUsageSampleRate: 100,
+      //   enableExperimentalFeatures: [],
+      // })
     </script>
   </head>
   <body></body>

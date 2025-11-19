@@ -9,7 +9,7 @@ const { command } = require('./command')
  */
 const BUILD_MODES = [
   // Used while developing. This is the default if the BUILD_MODE environment variable is empty.
-  'dev',
+  // 'dev',
 
   // Used for public releases.
   'release',
