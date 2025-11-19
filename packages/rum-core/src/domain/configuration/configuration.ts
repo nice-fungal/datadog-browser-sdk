@@ -1,4 +1,4 @@
-import type { Configuration, InitConfiguration, MatchOption, RawTelemetryConfiguration } from '@datadog/browser-core'
+import type { Configuration, InitConfiguration, MatchOption /*, RawTelemetryConfiguration */ } from '@datadog/browser-core'
 import {
   getType,
   isMatchOption,
@@ -323,5 +323,5 @@ export function serializeRumConfiguration(configuration: RumInitConfiguration) {
     })),
     track_feature_flags_for_events: configuration.trackFeatureFlagsForEvents,
     ...baseSerializedConfiguration,
-  } satisfies RawTelemetryConfiguration
+  } /* satisfies RawTelemetryConfiguration */
 }
