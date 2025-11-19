@@ -1,4 +1,4 @@
-import type { Configuration, InitConfiguration, RawTelemetryConfiguration } from '@datadog/browser-core'
+import type { Configuration, InitConfiguration /*, RawTelemetryConfiguration */ } from '@datadog/browser-core'
 import {
   serializeConfiguration,
   ONE_KIBI_BYTE,

@@ -1,7 +1,7 @@
 import type { RelativeTime, Context } from '@datadog/browser-core'
 import {
   willSyntheticsInjectRum,
-  addTelemetryDebug,
+  // addTelemetryDebug,
   getSyntheticsTestId,
   getSyntheticsResultId,
 } from '@datadog/browser-core'
@@ -24,10 +24,10 @@ export function getRUMInternalContext(startTime?: RelativeTime): Context | undef
     const context = getInternalContextFromRumGlobal(browserWindow.DD_RUM_SYNTHETICS)
     if (!context && !logsSentBeforeRumInjectionTelemetryAdded) {
       logsSentBeforeRumInjectionTelemetryAdded = true
-      addTelemetryDebug('Logs sent before RUM is injected by the synthetics worker', {
-        testId: getSyntheticsTestId(),
-        resultId: getSyntheticsResultId(),
-      })
+      // addTelemetryDebug('Logs sent before RUM is injected by the synthetics worker', {
+      //   testId: getSyntheticsTestId(),
+      //   resultId: getSyntheticsResultId(),
+      // })
     }
     return context
   }
