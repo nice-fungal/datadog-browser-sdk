@@ -15,14 +15,14 @@ export {
   isIntakeUrl,
 } from './domain/configuration'
 export { TrackingConsent, TrackingConsentState, createTrackingConsentState } from './domain/trackingConsent'
-export {
-  isExperimentalFeatureEnabled,
-  addExperimentalFeatures,
-  resetExperimentalFeatures,
-  getExperimentalFeatures,
-  initFeatureFlags,
-  ExperimentalFeature,
-} from './tools/experimentalFeatures'
+// export {
+//   isExperimentalFeatureEnabled,
+//   addExperimentalFeatures,
+//   resetExperimentalFeatures,
+//   getExperimentalFeatures,
+//   initFeatureFlags,
+//   ExperimentalFeature,
+// } from './tools/experimentalFeatures'
 export { trackRuntimeError } from './domain/error/trackRuntimeError'
 export { computeStackTrace, StackTrace } from './tools/stackTrace/computeStackTrace'
 export { defineGlobal, makePublicApi, PublicApi } from './boot/init'
