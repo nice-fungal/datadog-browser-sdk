@@ -1,22 +1,16 @@
 var __webpack_require__ = {
-    d: function(exports, definition) {
+    d: (exports, definition) => {
         for (var key in definition) __webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key) && Object.defineProperty(exports, key, {
             enumerable: !0,
             get: definition[key]
         });
     },
-    o: function(obj, prop) {
-        return Object.prototype.hasOwnProperty.call(obj, prop);
-    }
+    o: (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
 }, __webpack_exports__ = {};
 
 __webpack_require__.d(__webpack_exports__, {
-    W: function() {
-        return DefaultPrivacyLevel;
-    },
-    L: function() {
-        return datadogRum;
-    }
+    W: () => DefaultPrivacyLevel,
+    L: () => datadogRum
 });
 
 const display_ConsoleApiName = {
@@ -80,11 +74,15 @@ function callMonitored(fn, context, args) {
     try {
         return fn.apply(context, args);
     } catch (e) {
-        if (monitor_displayIfDebugEnabled(e), onMonitorErrorCollected) try {
-            onMonitorErrorCollected(e);
-        } catch (e) {
-            monitor_displayIfDebugEnabled(e);
-        }
+        monitorError(e);
+    }
+}
+
+function monitorError(e) {
+    if (monitor_displayIfDebugEnabled(e), onMonitorErrorCollected) try {
+        onMonitorErrorCollected(e);
+    } catch (e) {
+        monitor_displayIfDebugEnabled(e);
     }
 }
 
@@ -92,60 +90,9 @@ function monitor_displayIfDebugEnabled(...args) {
     debugMode && display.error("[MONITOR]", ...args);
 }
 
-function polyfills_includes(candidate, search) {
-    return -1 !== candidate.indexOf(search);
-}
-
-function polyfills_arrayFrom(arrayLike) {
-    if (Array.from) return Array.from(arrayLike);
-    const array = [];
-    if (arrayLike instanceof Set) arrayLike.forEach((item => array.push(item))); else for (let i = 0; i < arrayLike.length; i++) array.push(arrayLike[i]);
-    return array;
-}
-
-function find(array, predicate) {
-    for (let i = 0; i < array.length; i += 1) {
-        const item = array[i];
-        if (predicate(item, i)) return item;
-    }
-}
-
-function findLast(array, predicate) {
-    for (let i = array.length - 1; i >= 0; i -= 1) {
-        const item = array[i];
-        if (predicate(item, i, array)) return item;
-    }
-}
-
-function forEach(list, callback) {
-    Array.prototype.forEach.call(list, callback);
-}
-
-function objectValues(object) {
-    return Object.keys(object).map((key => object[key]));
-}
-
-function objectEntries(object) {
-    return Object.keys(object).map((key => [ key, object[key] ]));
-}
-
-function startsWith(candidate, search) {
-    return candidate.slice(0, search.length) === search;
-}
-
-function endsWith(candidate, search) {
-    return candidate.slice(-search.length) === search;
-}
-
-function polyfills_assign(target, ...toAssign) {
-    return toAssign.forEach((source => {
-        for (const key in source) Object.prototype.hasOwnProperty.call(source, key) && (target[key] = source[key]);
-    })), target;
-}
-
 function makePublicApi(stub) {
-    const publicApi = polyfills_assign({
-        version: "5.35.0",
+    const publicApi = Object.assign({
+        version: "6.0.0",
         onReady(callback) {
             callback();
         }
@@ -251,7 +198,7 @@ function detachToJsonMethod(value) {
 }
 
 function shallowClone(object) {
-    return polyfills_assign({}, object);
+    return Object.assign({}, object);
 }
 
 function objectHasValue(object, value) {
@@ -427,13 +374,21 @@ function sanitizePrimitivesAndFunctions(value) {
 
 function sanitizeObjects(value) {
     try {
-        if (value instanceof Event) return {
-            isTrusted: value.isTrusted
-        };
+        if (value instanceof Event) return sanitizeEvent(value);
+        if (value instanceof RegExp) return `[RegExp] ${value.toString()}`;
         const match = Object.prototype.toString.call(value).match(/\[object (.*)\]/);
         if (match && match[1]) return `[${match[1]}]`;
     } catch (_a) {}
     return "[Unserializable]";
+}
+
+function sanitizeEvent(event) {
+    return {
+        type: event.type,
+        isTrusted: event.isTrusted,
+        currentTarget: event.currentTarget ? sanitizeObjects(event.currentTarget) : null,
+        target: event.target ? sanitizeObjects(event.target) : null
+    };
 }
 
 function tryToApplyToJSON(value) {
@@ -594,7 +549,7 @@ function computeStackTrace(ex) {
     const stack = [];
     let stackProperty = tryToGetString(ex, "stack");
     const exString = String(ex);
-    return stackProperty && startsWith(stackProperty, exString) && (stackProperty = stackProperty.slice(exString.length)), 
+    return stackProperty && stackProperty.startsWith(exString) && (stackProperty = stackProperty.slice(exString.length)), 
     stackProperty && stackProperty.split("\n").forEach((line => {
         const stackFrame = parseChromeLine(line) || parseChromeAnonymousLine(line) || parseWinLine(line) || parseGeckoLine(line);
         stackFrame && (!stackFrame.func && stackFrame.line && (stackFrame.func = "?"), stack.push(stackFrame));
@@ -696,11 +651,6 @@ function tryToParseMessage(messageObj) {
 function createHandlingStack() {
     const error = new Error;
     let formattedStack;
-    if (!error.stack) try {
-        throw error;
-    } catch (_a) {
-        functionUtils_noop();
-    }
     return callMonitored((() => {
         const stackTrace = computeStackTrace(error);
         stackTrace.stack = stackTrace.stack.slice(2), formattedStack = toStackTraceString(stackTrace);
@@ -735,7 +685,7 @@ function isNumber(value) {
     return "number" == typeof value;
 }
 
-const ONE_SECOND = 1e3, ONE_MINUTE = 6e4, ONE_HOUR = 36e5, ONE_DAY = 864e5, timeUtils_ONE_YEAR = 31536e6;
+const ONE_SECOND = 1e3, ONE_MINUTE = 6e4, ONE_HOUR = 36e5, ONE_DAY = 864e5, ONE_YEAR = 31536e6;
 
 function relativeToClocks(relative) {
     return {
@@ -807,7 +757,7 @@ function getTimeStamp(relativeTime) {
 }
 
 function looksLikeRelativeTime(time) {
-    return time < 31536e6;
+    return time < ONE_YEAR;
 }
 
 let navigationStart;
@@ -818,7 +768,7 @@ function getNavigationStart() {
 }
 
 function sanitizeUser(newUser) {
-    const user = polyfills_assign({}, newUser);
+    const user = Object.assign({}, newUser);
     return [ "id", "name", "email" ].forEach((key => {
         key in user && (user[key] = String(user[key]));
     })), user;
@@ -830,7 +780,7 @@ function checkUser(newUser) {
 }
 
 function generateAnonymousId() {
-    return Math.floor(Math.random() * Math.pow(2, 53)).toString(36);
+    return Math.floor(Math.random() * Math.pow(36, 10)).toString(36).padStart(10, "0");
 }
 
 function displayAlreadyInitializedError(sdkName, initConfiguration) {
@@ -952,7 +902,7 @@ function processVital(vital, valueComputedBySdk) {
 
 function removeDuplicates(array) {
     const set = new Set;
-    return array.forEach((item => set.add(item))), arrayFrom(set);
+    return array.forEach((item => set.add(item))), Array.from(set);
 }
 
 function removeItem(array, item) {
@@ -980,7 +930,7 @@ function boundedBuffer_createBoundedBuffer() {
 function instrumentMethod(targetPrototype, method, onPreCall, {computeHandlingStack: computeHandlingStack} = {}) {
     let original = targetPrototype[method];
     if ("function" != typeof original) {
-        if (!(method in targetPrototype) || !startsWith(method, "on")) return {
+        if (!(method in targetPrototype) || !method.startsWith("on")) return {
             stop: functionUtils_noop
         };
         original = functionUtils_noop;
@@ -988,7 +938,7 @@ function instrumentMethod(targetPrototype, method, onPreCall, {computeHandlingSt
     let stopped = !1;
     const instrumentation = function() {
         if (stopped) return original.apply(this, arguments);
-        const parameters = polyfills_arrayFrom(arguments);
+        const parameters = Array.from(arguments);
         let postCallCallback;
         callMonitored(onPreCall, null, [ {
             target: this,
@@ -1123,7 +1073,7 @@ function beforeSend({parameters: parameters, onPostCall: onPostCall, handlingSta
 function afterSend(observable, responsePromise, startContext) {
     const context = startContext;
     function reportFetch(partialContext) {
-        context.state = "resolve", polyfills_assign(context, partialContext), observable.notify(context);
+        context.state = "resolve", Object.assign(context, partialContext), observable.notify(context);
     }
     responsePromise.then(monitor((response => {
         reportFetch({
@@ -1209,16 +1159,12 @@ function getSyntheticsResultId() {
     return "string" == typeof value ? value : void 0;
 }
 
-function isIE() {
+function isChromium() {
     return 0 === detectBrowserCached();
 }
 
-function isChromium() {
-    return 1 === detectBrowserCached();
-}
-
 function isSafari() {
-    return 2 === detectBrowserCached();
+    return 1 === detectBrowserCached();
 }
 
 let browserCache;
@@ -1230,13 +1176,30 @@ function detectBrowserCached() {
 function detectBrowser(browserWindow = window) {
     var _a;
     const userAgent = browserWindow.navigator.userAgent;
-    return browserWindow.chrome || /HeadlessChrome/.test(userAgent) ? 1 : 0 === (null === (_a = browserWindow.navigator.vendor) || void 0 === _a ? void 0 : _a.indexOf("Apple")) || /safari/i.test(userAgent) && !/chrome|android/i.test(userAgent) ? 2 : browserWindow.document.documentMode ? 0 : 3;
+    return browserWindow.chrome || /HeadlessChrome/.test(userAgent) ? 0 : 0 === (null === (_a = browserWindow.navigator.vendor) || void 0 === _a ? void 0 : _a.indexOf("Apple")) || /safari/i.test(userAgent) && !/chrome|android/i.test(userAgent) ? 1 : 2;
 }
 
-const SESSION_TIME_OUT_DELAY = 144e5, SESSION_EXPIRATION_DELAY = 9e5, SESSION_COOKIE_EXPIRATION_DELAY = null, SessionPersistence = {
+const SESSION_TIME_OUT_DELAY = 144e5, SESSION_EXPIRATION_DELAY = 9e5, SESSION_COOKIE_EXPIRATION_DELAY = ONE_YEAR, SessionPersistence = {
     COOKIE: "cookie",
     LOCAL_STORAGE: "local-storage"
-}, SESSION_ENTRY_REGEXP = /^([a-zA-Z]+)=([a-z0-9-]+)$/, SESSION_ENTRY_SEPARATOR = "&";
+};
+
+function findLast(array, predicate) {
+    for (let i = array.length - 1; i >= 0; i -= 1) {
+        const item = array[i];
+        if (predicate(item, i, array)) return item;
+    }
+}
+
+function objectValues(object) {
+    return Object.values(object);
+}
+
+function objectEntries(object) {
+    return Object.entries(object);
+}
+
+const SESSION_ENTRY_REGEXP = /^([a-zA-Z]+)=([a-z0-9-]+)$/, SESSION_ENTRY_SEPARATOR = "&";
 
 function isValidSessionString(sessionString) {
     return !!sessionString && (-1 !== sessionString.indexOf("&") || SESSION_ENTRY_REGEXP.test(sessionString));
@@ -1244,10 +1207,12 @@ function isValidSessionString(sessionString) {
 
 const EXPIRED = "1";
 
-function getExpiredSessionState(previousSessionState) {
-    return {
+function getExpiredSessionState(previousSessionState, configuration) {
+    const expiredSessionState = {
         isExpired: "1"
     };
+    return configuration.trackAnonymousUser && ((null == previousSessionState ? void 0 : previousSessionState.anonymousId) ? expiredSessionState.anonymousId = null == previousSessionState ? void 0 : previousSessionState.anonymousId : expiredSessionState.anonymousId = generateAnonymousId()), 
+    expiredSessionState;
 }
 
 function isSessionInNotStartedState(session) {
@@ -1295,12 +1260,12 @@ function selectCookieStrategy(initConfiguration) {
     } : void 0;
 }
 
-function initCookieStrategy(cookieOptions) {
+function initCookieStrategy(configuration, cookieOptions) {
     return {
         isLockEnabled: isChromium(),
         persistSession: persistSessionCookie(cookieOptions),
         retrieveSession: retrieveSessionCookie,
-        expireSession: sessionState => expireSessionCookie(cookieOptions, sessionState)
+        expireSession: sessionState => expireSessionCookie(cookieOptions, sessionState, configuration)
     };
 }
 
@@ -1310,8 +1275,8 @@ function persistSessionCookie(options) {
     };
 }
 
-function expireSessionCookie(options, sessionState) {
-    setCookie("_dd_s", toSessionString(getExpiredSessionState(sessionState)), 144e5, options);
+function expireSessionCookie(options, sessionState, configuration) {
+    setCookie("_dd_s", toSessionString(getExpiredSessionState(sessionState, configuration)), configuration.trackAnonymousUser ? 31536e6 : 144e5, options);
 }
 
 function retrieveSessionCookie() {
@@ -1342,12 +1307,12 @@ function selectLocalStorageStrategy() {
     }
 }
 
-function initLocalStorageStrategy() {
+function initLocalStorageStrategy(configuration) {
     return {
         isLockEnabled: !1,
         persistSession: persistInLocalStorage,
         retrieveSession: retrieveSessionFromLocalStorage,
-        expireSession: expireSessionFromLocalStorage
+        expireSession: sessionState => expireSessionFromLocalStorage(sessionState, configuration)
     };
 }
 
@@ -1359,8 +1324,8 @@ function retrieveSessionFromLocalStorage() {
     return toSessionState(localStorage.getItem("_dd_s"));
 }
 
-function expireSessionFromLocalStorage(previousSessionState) {
-    persistInLocalStorage(getExpiredSessionState(previousSessionState));
+function expireSessionFromLocalStorage(previousSessionState, configuration) {
+    persistInLocalStorage(getExpiredSessionState(previousSessionState, configuration));
 }
 
 const LOCK_RETRY_DELAY = 10, LOCK_MAX_TRIES = 100, bufferedOperations = [];
@@ -1369,7 +1334,7 @@ let ongoingOperations;
 
 function processSessionStoreOperations(operations, sessionStoreStrategy, numberOfRetries = 0) {
     var _a;
-    const {isLockEnabled: isLockEnabled, persistSession: persistSession, expireSession: expireSession} = sessionStoreStrategy, persistWithLock = session => persistSession(polyfills_assign({}, session, {
+    const {isLockEnabled: isLockEnabled, persistSession: persistSession, expireSession: expireSession} = sessionStoreStrategy, persistWithLock = session => persistSession(Object.assign(Object.assign({}, session), {
         lock: currentLock
     })), retrieveStore = () => {
         const session = sessionStoreStrategy.retrieveSession(), lock = session.lock;
@@ -1433,10 +1398,10 @@ function selectSessionStoreStrategyType(initConfiguration) {
     }
 }
 
-function startSessionStore(sessionStoreStrategyType, productKey, computeSessionState) {
-    const renewObservable = new observable_Observable, expireObservable = new observable_Observable, sessionStateUpdateObservable = new observable_Observable, sessionStoreStrategy = sessionStoreStrategyType.type === SessionPersistence.COOKIE ? initCookieStrategy(sessionStoreStrategyType.cookieOptions) : initLocalStorageStrategy(), {expireSession: expireSession} = sessionStoreStrategy, watchSessionTimeoutId = timer_setInterval((function() {
+function startSessionStore(sessionStoreStrategyType, configuration, productKey, computeSessionState) {
+    const renewObservable = new observable_Observable, expireObservable = new observable_Observable, sessionStateUpdateObservable = new observable_Observable, sessionStoreStrategy = sessionStoreStrategyType.type === SessionPersistence.COOKIE ? initCookieStrategy(configuration, sessionStoreStrategyType.cookieOptions) : initLocalStorageStrategy(configuration), {expireSession: expireSession} = sessionStoreStrategy, watchSessionTimeoutId = timer_setInterval((function() {
         processSessionStoreOperations({
-            process: sessionState => isSessionInExpiredState(sessionState) ? getExpiredSessionState(sessionState) : void 0,
+            process: sessionState => isSessionInExpiredState(sessionState) ? getExpiredSessionState(sessionState, configuration) : void 0,
             after: synchronizeSession
         }, sessionStoreStrategy);
     }), 1e3);
@@ -1462,19 +1427,19 @@ function startSessionStore(sessionStoreStrategyType, productKey, computeSessionS
         }, sessionStoreStrategy);
     }), 1e3);
     function synchronizeSession(sessionState) {
-        return isSessionInExpiredState(sessionState) && (sessionState = getExpiredSessionState(sessionState)), 
+        return isSessionInExpiredState(sessionState) && (sessionState = getExpiredSessionState(sessionState, configuration)), 
         hasSessionInCache() && (!function(sessionState) {
             return sessionCache.id !== sessionState.id || sessionCache[productKey] !== sessionState[productKey];
         }(sessionState) ? (sessionStateUpdateObservable.notify({
             previousState: sessionCache,
             newState: sessionState
-        }), sessionCache = sessionState) : (sessionCache = getExpiredSessionState(sessionCache), 
+        }), sessionCache = sessionState) : (sessionCache = getExpiredSessionState(sessionCache, configuration), 
         expireObservable.notify())), sessionState;
     }
     function startSession() {
         processSessionStoreOperations({
             process: sessionState => {
-                if (isSessionInNotStartedState(sessionState)) return getExpiredSessionState(sessionState);
+                if (isSessionInNotStartedState(sessionState)) return getExpiredSessionState(sessionState, configuration);
             },
             after: sessionState => {
                 sessionCache = sessionState;
@@ -1497,14 +1462,14 @@ function startSessionStore(sessionStoreStrategyType, productKey, computeSessionS
         sessionStateUpdateObservable: sessionStateUpdateObservable,
         restartSession: startSession,
         expire: () => {
-            cancelExpandOrRenewSession(), expireSession(sessionCache), synchronizeSession(getExpiredSessionState(sessionCache));
+            cancelExpandOrRenewSession(), expireSession(sessionCache), synchronizeSession(getExpiredSessionState(sessionCache, configuration));
         },
         stop: () => {
             timer_clearInterval(watchSessionTimeoutId);
         },
         updateSessionState: function(partialSessionState) {
             processSessionStoreOperations({
-                process: sessionState => polyfills_assign({}, sessionState, partialSessionState),
+                process: sessionState => Object.assign(Object.assign({}, sessionState), partialSessionState),
                 after: synchronizeSession
             }, sessionStoreStrategy);
         }
@@ -1549,9 +1514,9 @@ function buildEndpointHost(trackType, initConfiguration) {
 }
 
 function buildEndpointParameters({clientToken: clientToken, internalAnalyticsSubdomain: internalAnalyticsSubdomain}, trackType, configurationTags, api, {retry: retry, encoding: encoding}) {
-    const tags = [ "sdk_version:5.35.0", `api:${api}` ].concat(configurationTags);
+    const tags = [ "sdk_version:6.0.0", `api:${api}` ].concat(configurationTags);
     retry && tags.push(`retry_count:${retry.count}`, `retry_after:${retry.lastFailureStatus}`);
-    const parameters = [ "ddsource=browser", `ddtags=${encodeURIComponent(tags.join(","))}`, `dd-api-key=${clientToken}`, `dd-evp-origin-version=${encodeURIComponent("5.35.0")}`, "dd-evp-origin=browser", `dd-request-id=${generateUUID()}` ];
+    const parameters = [ "ddsource=browser", `ddtags=${encodeURIComponent(tags.join(","))}`, `dd-api-key=${clientToken}`, `dd-evp-origin-version=${encodeURIComponent("6.0.0")}`, "dd-evp-origin=browser", `dd-request-id=${generateUUID()}` ];
     return encoding && parameters.push(`dd-evp-encoding=${encoding}`), "rum" === trackType && parameters.push(`batch_time=${timeUtils_timeStampNow()}`), 
     internalAnalyticsSubdomain && parameters.reverse(), parameters.join("&");
 }
@@ -1584,9 +1549,9 @@ function supportUnicodePropertyEscapes() {
 }
 
 function computeTransportConfiguration(initConfiguration) {
-    const site = initConfiguration.site || INTAKE_SITE_US1, tags = buildTags(initConfiguration), endpointBuilders = computeEndpointBuilders(initConfiguration, tags);
-    return polyfills_assign({
-        replica: computeReplicaConfiguration(initConfiguration, tags),
+    const site = initConfiguration.site || INTAKE_SITE_US1, tags = buildTags(initConfiguration), endpointBuilders = computeEndpointBuilders(initConfiguration, tags), replicaConfiguration = computeReplicaConfiguration(initConfiguration, tags);
+    return Object.assign({
+        replica: replicaConfiguration,
         site: site
     }, endpointBuilders);
 }
@@ -1601,20 +1566,20 @@ function computeEndpointBuilders(initConfiguration, tags) {
 
 function computeReplicaConfiguration(initConfiguration, tags) {
     if (!initConfiguration.replica) return;
-    const replicaConfiguration = polyfills_assign({}, initConfiguration, {
+    const replicaConfiguration = Object.assign(Object.assign({}, initConfiguration), {
         site: INTAKE_SITE_US1,
         clientToken: initConfiguration.replica.clientToken
     }), replicaEndpointBuilders = {
         logsEndpointBuilder: createEndpointBuilder(replicaConfiguration, "logs", tags),
         rumEndpointBuilder: createEndpointBuilder(replicaConfiguration, "rum", tags)
     };
-    return polyfills_assign({
+    return Object.assign({
         applicationId: initConfiguration.replica.applicationId
     }, replicaEndpointBuilders);
 }
 
 function isIntakeUrl(url) {
-    return INTAKE_URL_PARAMETERS.every((param => polyfills_includes(url, param)));
+    return INTAKE_URL_PARAMETERS.every((param => url.includes(param)));
 }
 
 const DefaultPrivacyLevel = {
@@ -1642,10 +1607,10 @@ function isSampleRate(sampleRate, name) {
 }
 
 function validateAndBuildConfiguration(initConfiguration) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     if (initConfiguration && initConfiguration.clientToken) {
         if (isDatadogSite(initConfiguration.site) && isSampleRate(initConfiguration.sessionSampleRate, "Session") && isSampleRate(initConfiguration.telemetrySampleRate, "Telemetry") && isSampleRate(initConfiguration.telemetryConfigurationSampleRate, "Telemetry Configuration") && isSampleRate(initConfiguration.telemetryUsageSampleRate, "Telemetry Usage") && isString(initConfiguration.version, "Version") && isString(initConfiguration.env, "Env") && isString(initConfiguration.service, "Service")) {
-            if (void 0 === initConfiguration.trackingConsent || objectHasValue(TrackingConsent, initConfiguration.trackingConsent)) return polyfills_assign({
+            if (void 0 === initConfiguration.trackingConsent || objectHasValue(TrackingConsent, initConfiguration.trackingConsent)) return Object.assign({
                 beforeSend: initConfiguration.beforeSend && catchUserErrors(initConfiguration.beforeSend, "beforeSend threw an error:"),
                 sessionStoreStrategyType: selectSessionStoreStrategyType(initConfiguration),
                 sessionSampleRate: null !== (_a = initConfiguration.sessionSampleRate) && void 0 !== _a ? _a : 100,
@@ -1656,6 +1621,7 @@ function validateAndBuildConfiguration(initConfiguration) {
                 silentMultipleInit: !!initConfiguration.silentMultipleInit,
                 allowUntrustedEvents: !!initConfiguration.allowUntrustedEvents,
                 trackingConsent: null !== (_e = initConfiguration.trackingConsent) && void 0 !== _e ? _e : TrackingConsent.GRANTED,
+                trackAnonymousUser: null === (_f = initConfiguration.trackAnonymousUser) || void 0 === _f || _f,
                 storeContextsAcrossPages: !!initConfiguration.storeContextsAcrossPages,
                 batchBytesLimit: 16384,
                 eventRateLimiterThreshold: 3e3,
@@ -1681,6 +1647,7 @@ function configuration_serializeConfiguration(initConfiguration) {
         use_proxy: !!initConfiguration.proxy,
         silent_multiple_init: initConfiguration.silentMultipleInit,
         track_session_across_subdomains: initConfiguration.trackSessionAcrossSubdomains,
+        track_anonymous_user: initConfiguration.trackAnonymousUser,
         session_persistence: initConfiguration.sessionPersistence,
         store_contexts_across_pages: !!initConfiguration.storeContextsAcrossPages,
         allow_untrusted_events: !!initConfiguration.allowUntrustedEvents,
@@ -1698,7 +1665,7 @@ function matchList(list, value, useStartsWith = !1) {
         try {
             if ("function" == typeof item) return item(value);
             if (item instanceof RegExp) return item.test(value);
-            if ("string" == typeof item) return useStartsWith ? startsWith(value, item) : item === value;
+            if ("string" == typeof item) return useStartsWith ? value.startsWith(item) : item === value;
         } catch (e) {
             display.error(e);
         }
@@ -1755,7 +1722,7 @@ function isTracingSupported() {
 const DEFAULT_PROPAGATOR_TYPES = [ "tracecontext", "datadog" ];
 
 function validateAndBuildRumConfiguration(initConfiguration) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e, _f;
     if (!initConfiguration.applicationId) return void display.error("Application ID is not configured, no RUM data will be collected.");
     if (!isSampleRate(initConfiguration.sessionReplaySampleRate, "Session Replay") || !isSampleRate(initConfiguration.traceSampleRate, "Trace")) return;
     if (void 0 !== initConfiguration.excludedActivityUrls && !Array.isArray(initConfiguration.excludedActivityUrls)) return void display.error("Excluded Activity Urls should be an array");
@@ -1764,7 +1731,7 @@ function validateAndBuildRumConfiguration(initConfiguration) {
     const baseConfiguration = validateAndBuildConfiguration(initConfiguration);
     if (!baseConfiguration) return;
     const sessionReplaySampleRate = null !== (_a = initConfiguration.sessionReplaySampleRate) && void 0 !== _a ? _a : 0;
-    return polyfills_assign({
+    return Object.assign({
         applicationId: initConfiguration.applicationId,
         version: initConfiguration.version || void 0,
         actionNameAttribute: initConfiguration.actionNameAttribute,
@@ -1776,15 +1743,15 @@ function validateAndBuildRumConfiguration(initConfiguration) {
         excludedActivityUrls: null !== (_c = initConfiguration.excludedActivityUrls) && void 0 !== _c ? _c : [],
         workerUrl: initConfiguration.workerUrl,
         compressIntakeRequests: !!initConfiguration.compressIntakeRequests,
-        trackUserInteractions: !!initConfiguration.trackUserInteractions,
+        trackUserInteractions: !(null !== (_d = initConfiguration.trackUserInteractions) && void 0 !== _d && !_d),
         trackViewsManually: !!initConfiguration.trackViewsManually,
-        trackResources: !!initConfiguration.trackResources,
-        trackLongTasks: !!initConfiguration.trackLongTasks,
+        trackResources: !(null !== (_e = initConfiguration.trackResources) && void 0 !== _e && !_e),
+        trackLongTasks: !(null !== (_f = initConfiguration.trackLongTasks) && void 0 !== _f && !_f),
         subdomain: initConfiguration.subdomain,
         defaultPrivacyLevel: objectHasValue(DefaultPrivacyLevel, initConfiguration.defaultPrivacyLevel) ? initConfiguration.defaultPrivacyLevel : DefaultPrivacyLevel.MASK,
         enablePrivacyForActionName: !!initConfiguration.enablePrivacyForActionName,
         customerDataTelemetrySampleRate: 1,
-        traceContextInjection: objectHasValue(TraceContextInjection, initConfiguration.traceContextInjection) ? initConfiguration.traceContextInjection : TraceContextInjection.ALL,
+        traceContextInjection: objectHasValue(TraceContextInjection, initConfiguration.traceContextInjection) ? initConfiguration.traceContextInjection : TraceContextInjection.SAMPLED,
         plugins: initConfiguration.plugins || []
     }, baseConfiguration);
 }
@@ -1806,13 +1773,13 @@ function getSelectedTracingPropagators(configuration) {
     const usedTracingPropagators = new Set;
     return Array.isArray(configuration.allowedTracingUrls) && configuration.allowedTracingUrls.length > 0 && configuration.allowedTracingUrls.forEach((option => {
         isMatchOption(option) ? DEFAULT_PROPAGATOR_TYPES.forEach((propagatorType => usedTracingPropagators.add(propagatorType))) : "object" === getType(option) && Array.isArray(option.propagatorTypes) && option.propagatorTypes.forEach((propagatorType => usedTracingPropagators.add(propagatorType)));
-    })), arrayFrom(usedTracingPropagators);
+    })), Array.from(usedTracingPropagators);
 }
 
 function serializeRumConfiguration(configuration) {
     var _a;
     const baseSerializedConfiguration = serializeConfiguration(configuration);
-    return assign({
+    return Object.assign({
         session_replay_sample_rate: configuration.sessionReplaySampleRate,
         start_session_replay_recording_manually: configuration.startSessionReplayRecordingManually,
         trace_sample_rate: configuration.traceSampleRate,
@@ -1831,7 +1798,7 @@ function serializeRumConfiguration(configuration) {
         track_long_task: configuration.trackLongTasks,
         plugins: null === (_a = configuration.plugins) || void 0 === _a ? void 0 : _a.map((plugin => {
             var _a;
-            return assign({
+            return Object.assign({
                 name: plugin.name
             }, null === (_a = plugin.getConfigurationTelemetry) || void 0 === _a ? void 0 : _a.call(plugin));
         }))
@@ -2034,7 +2001,7 @@ function makeRumPublicApi(startRumImpl, recorderApi, options = {}) {
 }
 
 function createPostStartStrategy(preStartStrategy, startRumResult) {
-    return polyfills_assign({
+    return Object.assign({
         init: initConfiguration => {
             displayAlreadyInitializedError("DD_RUM", initConfiguration);
         },
@@ -2071,7 +2038,7 @@ function createPageExitObservable(configuration) {
 }
 
 function isPageExitReason(reason) {
-    return polyfills_includes(objectValues(PageExitReason), reason);
+    return objectValues(PageExitReason).includes(reason);
 }
 
 function createDOMMutationObservable() {
@@ -2211,21 +2178,21 @@ let modifiableFieldPathsByEvent;
 
 function startRumAssembly(configuration, lifeCycle, sessionManager, viewHistory, urlContexts, actionContexts, displayContext, ciVisibilityContext, getCommonContext, reportError) {
     modifiableFieldPathsByEvent = {
-        view: polyfills_assign({}, USER_CUSTOMIZABLE_FIELD_PATHS, VIEW_MODIFIABLE_FIELD_PATHS),
-        error: polyfills_assign({
+        view: Object.assign(Object.assign({}, USER_CUSTOMIZABLE_FIELD_PATHS), VIEW_MODIFIABLE_FIELD_PATHS),
+        error: Object.assign(Object.assign(Object.assign({
             "error.message": "string",
             "error.stack": "string",
             "error.resource.url": "string",
             "error.fingerprint": "string"
-        }, USER_CUSTOMIZABLE_FIELD_PATHS, VIEW_MODIFIABLE_FIELD_PATHS, ROOT_MODIFIABLE_FIELD_PATHS),
-        resource: polyfills_assign({
+        }, USER_CUSTOMIZABLE_FIELD_PATHS), VIEW_MODIFIABLE_FIELD_PATHS), ROOT_MODIFIABLE_FIELD_PATHS),
+        resource: Object.assign(Object.assign(Object.assign({
             "resource.url": "string"
-        }, {}, USER_CUSTOMIZABLE_FIELD_PATHS, VIEW_MODIFIABLE_FIELD_PATHS, ROOT_MODIFIABLE_FIELD_PATHS),
-        action: polyfills_assign({
+        }, USER_CUSTOMIZABLE_FIELD_PATHS), VIEW_MODIFIABLE_FIELD_PATHS), ROOT_MODIFIABLE_FIELD_PATHS),
+        action: Object.assign(Object.assign(Object.assign({
             "action.target.name": "string"
-        }, USER_CUSTOMIZABLE_FIELD_PATHS, VIEW_MODIFIABLE_FIELD_PATHS, ROOT_MODIFIABLE_FIELD_PATHS),
-        long_task: polyfills_assign({}, USER_CUSTOMIZABLE_FIELD_PATHS, VIEW_MODIFIABLE_FIELD_PATHS),
-        vital: polyfills_assign({}, USER_CUSTOMIZABLE_FIELD_PATHS, VIEW_MODIFIABLE_FIELD_PATHS)
+        }, USER_CUSTOMIZABLE_FIELD_PATHS), VIEW_MODIFIABLE_FIELD_PATHS), ROOT_MODIFIABLE_FIELD_PATHS),
+        long_task: Object.assign(Object.assign({}, USER_CUSTOMIZABLE_FIELD_PATHS), VIEW_MODIFIABLE_FIELD_PATHS),
+        vital: Object.assign(Object.assign({}, USER_CUSTOMIZABLE_FIELD_PATHS), VIEW_MODIFIABLE_FIELD_PATHS)
     };
     const eventRateLimiters = {
         error: createEventRateLimiter("error", configuration.eventRateLimiterThreshold, reportError),
@@ -2243,7 +2210,7 @@ function startRumAssembly(configuration, lifeCycle, sessionManager, viewHistory,
                         session_sample_rate: round(configuration.sessionSampleRate, 3),
                         session_replay_sample_rate: round(configuration.sessionReplaySampleRate, 3)
                     },
-                    browser_sdk_version: "5.35.0"
+                    browser_sdk_version: "6.0.0"
                 },
                 application: {
                     id: configuration.applicationId
@@ -2273,6 +2240,7 @@ function startRumAssembly(configuration, lifeCycle, sessionManager, viewHistory,
             serverRumEvent.context = mergeInto_combine(commonContext.context, viewHistoryEntry.context, customerContext), 
             "has_replay" in serverRumEvent.session || (serverRumEvent.session.has_replay = commonContext.hasReplay), 
             "view" === serverRumEvent.type && (serverRumEvent.session.sampled_for_replay = 1 === session.sessionReplay), 
+            session.anonymousId && !commonContext.user.anonymous_id && configuration.trackAnonymousUser && (commonContext.user.anonymous_id = session.anonymousId), 
             isEmptyObject(commonContext.user) || (serverRumEvent.usr = commonContext.user), 
             shouldSend(serverRumEvent, configuration.beforeSend, domainContext, eventRateLimiters) && (isEmptyObject(serverRumEvent.context) && delete serverRumEvent.context, 
             lifeCycle.notify(12, serverRumEvent));
@@ -2508,7 +2476,7 @@ function readBytesFromStream(stream, callback, options) {
     }();
 }
 
-const FAKE_INITIAL_DOCUMENT = "initial_document", RESOURCE_TYPES = [ [ "document", initiatorType => "initial_document" === initiatorType ], [ "xhr", initiatorType => "xmlhttprequest" === initiatorType ], [ "fetch", initiatorType => "fetch" === initiatorType ], [ "beacon", initiatorType => "beacon" === initiatorType ], [ "css", (_, path) => /\.css$/i.test(path) ], [ "js", (_, path) => /\.js$/i.test(path) ], [ "image", (initiatorType, path) => polyfills_includes([ "image", "img", "icon" ], initiatorType) || null !== /\.(gif|jpg|jpeg|tiff|png|svg|ico)$/i.exec(path) ], [ "font", (_, path) => null !== /\.(woff|eot|woff2|ttf)$/i.exec(path) ], [ "media", (initiatorType, path) => polyfills_includes([ "audio", "video" ], initiatorType) || null !== /\.(mp3|mp4)$/i.exec(path) ] ];
+const FAKE_INITIAL_DOCUMENT = "initial_document", RESOURCE_TYPES = [ [ "document", initiatorType => "initial_document" === initiatorType ], [ "xhr", initiatorType => "xmlhttprequest" === initiatorType ], [ "fetch", initiatorType => "fetch" === initiatorType ], [ "beacon", initiatorType => "beacon" === initiatorType ], [ "css", (_, path) => /\.css$/i.test(path) ], [ "js", (_, path) => /\.js$/i.test(path) ], [ "image", (initiatorType, path) => [ "image", "img", "icon" ].includes(initiatorType) || null !== /\.(gif|jpg|jpeg|tiff|png|svg|ico)$/i.exec(path) ], [ "font", (_, path) => null !== /\.(woff|eot|woff2|ttf)$/i.exec(path) ], [ "media", (initiatorType, path) => [ "audio", "video" ].includes(initiatorType) || null !== /\.(mp3|mp4)$/i.exec(path) ] ];
 
 function computeResourceEntryType(entry) {
     const url = entry.name;
@@ -2711,7 +2679,7 @@ function startActionCollection(lifeCycle, domMutationObservable, windowOpenObser
     return lifeCycle.subscribe(0, (action => lifeCycle.notify(11, processAction(action, pageStateHistory)))), 
     {
         addAction: (action, savedCommonContext) => {
-            lifeCycle.notify(11, polyfills_assign({
+            lifeCycle.notify(11, Object.assign({
                 savedCommonContext: savedCommonContext
             }, processAction(action, pageStateHistory)));
         },
@@ -2894,7 +2862,7 @@ function buildConsoleLog(params, api, handlingStack) {
     const message = params.map((param => formatConsoleParameters(param))).join(" ");
     let error;
     if (api === display_ConsoleApiName.error) {
-        const firstErrorParam = find(params, isError);
+        const firstErrorParam = params.find(isError);
         error = {
             stack: firstErrorParam ? toStackTraceString(computeStackTrace(firstErrorParam)) : void 0,
             fingerprint: tryToGetFingerprint(firstErrorParam),
@@ -2935,7 +2903,7 @@ const RawReportType = {
 
 function initReportObservable(configuration, apis) {
     const observables = [];
-    polyfills_includes(apis, RawReportType.cspViolation) && observables.push(createCspViolationReportObservable(configuration));
+    apis.includes(RawReportType.cspViolation) && observables.push(createCspViolationReportObservable(configuration));
     const reportTypes = apis.filter((api => api !== RawReportType.cspViolation));
     return reportTypes.length && observables.push(createReportObservable(reportTypes)), 
     mergeObservables(...observables);
@@ -2987,7 +2955,7 @@ function buildRawReportErrorFromCspViolation(event) {
 }
 
 function buildRawReportError(partial) {
-    return polyfills_assign({
+    return Object.assign({
         startClocks: clocksNow(),
         source: ErrorSource.REPORT,
         handling: "unhandled"
@@ -3026,10 +2994,10 @@ function startErrorCollection(lifeCycle, configuration, pageStateHistory, featur
 
 function doStartErrorCollection(lifeCycle, pageStateHistory, featureFlagContexts) {
     return lifeCycle.subscribe(13, (({error: error, customerContext: customerContext, savedCommonContext: savedCommonContext}) => {
-        lifeCycle.notify(11, polyfills_assign({
+        lifeCycle.notify(11, Object.assign({
             customerContext: customerContext,
             savedCommonContext: savedCommonContext
-        }, processError(error, pageStateHistory, "featureFlagContexts")));
+        }, processError(error, pageStateHistory, featureFlagContexts)));
     })), {
         addError: ({error: error, handlingStack: handlingStack, startClocks: startClocks, context: customerContext}, savedCommonContext) => {
             const rawError = computeRawError({
@@ -3078,6 +3046,51 @@ function processError(error, pageStateHistory, featureFlagContexts) {
         rawRumEvent: rawRumEvent,
         startTime: error.startClocks.relative,
         domainContext: domainContext
+    };
+}
+
+function requestIdleCallback(callback, opts) {
+    if (window.requestIdleCallback && window.cancelIdleCallback) {
+        const id = window.requestIdleCallback(monitor(callback), opts);
+        return () => window.cancelIdleCallback(id);
+    }
+    return requestIdleCallbackShim(callback);
+}
+
+const MAX_TASK_TIME = 50;
+
+function requestIdleCallbackShim(callback) {
+    const start = dateNow(), timeoutId = timer_setTimeout((() => {
+        callback({
+            didTimeout: !1,
+            timeRemaining: () => Math.max(0, 50 - (dateNow() - start))
+        });
+    }), 0);
+    return () => timer_clearTimeout(timeoutId);
+}
+
+const IDLE_CALLBACK_TIMEOUT = 1e3, MAX_EXECUTION_TIME_ON_TIMEOUT = 30;
+
+function createTaskQueue() {
+    const pendingTasks = [];
+    function run(deadline) {
+        let executionTimeRemaining;
+        if (deadline.didTimeout) {
+            const start = performance.now();
+            executionTimeRemaining = () => 30 - (performance.now() - start);
+        } else executionTimeRemaining = deadline.timeRemaining.bind(deadline);
+        for (;executionTimeRemaining() > 0 && pendingTasks.length; ) pendingTasks.shift()();
+        pendingTasks.length && scheduleNextRun();
+    }
+    function scheduleNextRun() {
+        requestIdleCallback(run, {
+            timeout: 1e3
+        });
+    }
+    return {
+        push(task) {
+            1 === pendingTasks.push(task) && scheduleNextRun();
+        }
     };
 }
 
@@ -3136,7 +3149,7 @@ function createPerformanceObservable(configuration, options) {
         try {
             observer.observe(options);
         } catch (_a) {
-            if (polyfills_includes([ RumPerformanceEntryType.RESOURCE, RumPerformanceEntryType.NAVIGATION, RumPerformanceEntryType.LONG_TASK, RumPerformanceEntryType.PAINT ], options.type)) {
+            if ([ RumPerformanceEntryType.RESOURCE, RumPerformanceEntryType.NAVIGATION, RumPerformanceEntryType.LONG_TASK, RumPerformanceEntryType.PAINT ].includes(options.type)) {
                 options.buffered && (timeoutId = timer_setTimeout((() => handlePerformanceEntries(performance.getEntriesByType(options.type)))));
                 try {
                     observer.observe({
@@ -3157,7 +3170,7 @@ function createPerformanceObservable(configuration, options) {
     }));
 }
 
-let resourceTimingBufferFullListener;
+let resourceTimingBufferFullListener, createIdentifierImplementationCache;
 
 function manageResourceTimingBufferFull(configuration) {
     return !resourceTimingBufferFullListener && supportPerformanceObject() && "addEventListener" in performance && (resourceTimingBufferFullListener = addEventListener(configuration, performance, "resourcetimingbufferfull", (() => {
@@ -3183,95 +3196,6 @@ function isForbiddenResource(entry) {
     return !(entry.entryType !== RumPerformanceEntryType.RESOURCE || isAllowedRequestUrl(entry.name) && hasValidResourceEntryDuration(entry));
 }
 
-function startLongTaskCollection(lifeCycle, configuration) {
-    const performanceLongTaskSubscription = createPerformanceObservable(configuration, {
-        type: RumPerformanceEntryType.LONG_TASK,
-        buffered: !0
-    }).subscribe((entries => {
-        for (const entry of entries) {
-            if (entry.entryType !== RumPerformanceEntryType.LONG_TASK) break;
-            if (!configuration.trackLongTasks) break;
-            const startClocks = relativeToClocks(entry.startTime), rawRumEvent = {
-                date: startClocks.timeStamp,
-                long_task: {
-                    id: generateUUID(),
-                    entry_type: "long-task",
-                    duration: toServerDuration(entry.duration)
-                },
-                type: "long_task",
-                _dd: {
-                    discarded: !1
-                }
-            };
-            lifeCycle.notify(11, {
-                rawRumEvent: rawRumEvent,
-                startTime: startClocks.relative,
-                domainContext: {
-                    performanceEntry: entry
-                }
-            });
-        }
-    }));
-    return {
-        stop() {
-            performanceLongTaskSubscription.unsubscribe();
-        }
-    };
-}
-
-function requestIdleCallback(callback, opts) {
-    if (window.requestIdleCallback && window.cancelIdleCallback) {
-        const id = window.requestIdleCallback(monitor(callback), opts);
-        return () => window.cancelIdleCallback(id);
-    }
-    return requestIdleCallbackShim(callback);
-}
-
-!function(RumPerformanceEntryType) {
-    RumPerformanceEntryType.EVENT = "event", RumPerformanceEntryType.FIRST_INPUT = "first-input", 
-    RumPerformanceEntryType.LARGEST_CONTENTFUL_PAINT = "largest-contentful-paint", RumPerformanceEntryType.LAYOUT_SHIFT = "layout-shift", 
-    RumPerformanceEntryType.LONG_TASK = "longtask", RumPerformanceEntryType.LONG_ANIMATION_FRAME = "long-animation-frame", 
-    RumPerformanceEntryType.NAVIGATION = "navigation", RumPerformanceEntryType.PAINT = "paint", 
-    RumPerformanceEntryType.RESOURCE = "resource";
-}(RumPerformanceEntryType || (RumPerformanceEntryType = {}));
-
-const MAX_TASK_TIME = 50;
-
-function requestIdleCallbackShim(callback) {
-    const start = dateNow(), timeoutId = timer_setTimeout((() => {
-        callback({
-            didTimeout: !1,
-            timeRemaining: () => Math.max(0, 50 - (dateNow() - start))
-        });
-    }), 0);
-    return () => timer_clearTimeout(timeoutId);
-}
-
-const IDLE_CALLBACK_TIMEOUT = 1e3, MAX_EXECUTION_TIME_ON_TIMEOUT = 30;
-
-function createTaskQueue() {
-    const pendingTasks = [];
-    function run(deadline) {
-        let executionTimeRemaining;
-        if (deadline.didTimeout) {
-            const start = performance.now();
-            executionTimeRemaining = () => 30 - (performance.now() - start);
-        } else executionTimeRemaining = deadline.timeRemaining.bind(deadline);
-        for (;executionTimeRemaining() > 0 && pendingTasks.length; ) pendingTasks.shift()();
-        pendingTasks.length && scheduleNextRun();
-    }
-    function scheduleNextRun() {
-        requestIdleCallback(run, {
-            timeout: 1e3
-        });
-    }
-    return {
-        push(task) {
-            1 === pendingTasks.push(task) && scheduleNextRun();
-        }
-    };
-}
-
 function getCrypto() {
     return window.crypto || window.msCrypto;
 }
@@ -3283,8 +3207,6 @@ function createTraceIdentifier() {
 function createSpanIdentifier() {
     return createIdentifier(63);
 }
-
-let createIdentifierImplementationCache;
 
 function createIdentifier(bits) {
     return createIdentifierImplementationCache || (createIdentifierImplementationCache = createIdentifierUsingUint32Array), 
@@ -3323,49 +3245,15 @@ function toPaddedHexadecimalString(id) {
     return Array(17 - traceId.length).join("0") + traceId;
 }
 
-function cssEscape(str) {
-    return window.CSS && window.CSS.escape ? window.CSS.escape(str) : str.replace(/([\0-\x1f\x7f]|^-?\d)|^-$|[^\x80-\uFFFF\w-]/g, (function(ch, asCodePoint) {
-        return asCodePoint ? "\0" === ch ? "�" : `${ch.slice(0, -1)}\\${ch.charCodeAt(ch.length - 1).toString(16)} ` : `\\${ch}`;
-    }));
-}
+!function(RumPerformanceEntryType) {
+    RumPerformanceEntryType.EVENT = "event", RumPerformanceEntryType.FIRST_INPUT = "first-input", 
+    RumPerformanceEntryType.LARGEST_CONTENTFUL_PAINT = "largest-contentful-paint", RumPerformanceEntryType.LAYOUT_SHIFT = "layout-shift", 
+    RumPerformanceEntryType.LONG_TASK = "longtask", RumPerformanceEntryType.LONG_ANIMATION_FRAME = "long-animation-frame", 
+    RumPerformanceEntryType.NAVIGATION = "navigation", RumPerformanceEntryType.PAINT = "paint", 
+    RumPerformanceEntryType.RESOURCE = "resource";
+}(RumPerformanceEntryType || (RumPerformanceEntryType = {}));
 
-function polyfills_elementMatches(element, selector) {
-    return element.matches ? element.matches(selector) : !!element.msMatchesSelector && element.msMatchesSelector(selector);
-}
-
-function polyfills_getParentElement(node) {
-    if (node.parentElement) return node.parentElement;
-    for (;node.parentNode; ) {
-        if (node.parentNode.nodeType === Node.ELEMENT_NODE) return node.parentNode;
-        node = node.parentNode;
-    }
-    return null;
-}
-
-function getClassList(element) {
-    if (element.classList) return element.classList;
-    const classes = (element.getAttribute("class") || "").trim();
-    return classes ? classes.split(/\s+/) : [];
-}
-
-const PLACEHOLDER = 1;
-
-class polyfills_WeakSet {
-    constructor(initialValues) {
-        this.map = new WeakMap, initialValues && initialValues.forEach((value => this.map.set(value, 1)));
-    }
-    add(value) {
-        return this.map.set(value, 1), this;
-    }
-    delete(value) {
-        return this.map.delete(value);
-    }
-    has(value) {
-        return this.map.has(value);
-    }
-}
-
-const alreadyMatchedEntries = new polyfills_WeakSet;
+const alreadyMatchedEntries = new WeakSet;
 
 function matchRequestResourceEntry(request) {
     if (!performance || !("getEntriesByName" in performance)) return;
@@ -3394,6 +3282,12 @@ function runOnReadyState(configuration, expectedReadyState, callback) {
     return addEventListener(configuration, window, "complete" === expectedReadyState ? "load" : "DOMContentLoaded", callback, {
         once: !0
     });
+}
+
+function asyncRunOnReadyState(configuration, expectedReadyState) {
+    return new Promise((resolve => {
+        runOnReadyState(configuration, expectedReadyState, resolve);
+    }));
 }
 
 function htmlDomUtils_isTextNode(node) {
@@ -3480,7 +3374,7 @@ function getNavigationEntry() {
         const navigationEntry = performance.getEntriesByType(RumPerformanceEntryType.NAVIGATION)[0];
         if (navigationEntry) return navigationEntry;
     }
-    const timings = computeTimingsFromDeprecatedPerformanceTiming(), entry = polyfills_assign({
+    const timings = computeTimingsFromDeprecatedPerformanceTiming(), entry = Object.assign({
         entryType: RumPerformanceEntryType.NAVIGATION,
         initiatorType: "navigation",
         name: window.location.href,
@@ -3490,7 +3384,7 @@ function getNavigationEntry() {
         encodedBodySize: 0,
         transferSize: 0,
         workerStart: 0,
-        toJSON: () => polyfills_assign({}, entry, {
+        toJSON: () => Object.assign(Object.assign({}, entry), {
             toJSON: void 0
         })
     }, timings);
@@ -3508,11 +3402,11 @@ function computeTimingsFromDeprecatedPerformanceTiming() {
 
 function retrieveInitialDocumentResourceTiming(configuration, callback) {
     runOnReadyState(configuration, "interactive", (() => {
-        const entry = polyfills_assign(getNavigationEntry().toJSON(), {
+        const entry = Object.assign(getNavigationEntry().toJSON(), {
             entryType: RumPerformanceEntryType.RESOURCE,
             initiatorType: "initial_document",
             traceId: getDocumentTraceId(document),
-            toJSON: () => polyfills_assign({}, entry, {
+            toJSON: () => Object.assign(Object.assign({}, entry), {
                 toJSON: void 0
             })
         });
@@ -3611,10 +3505,10 @@ function processResourceEntry(entry, configuration) {
 function computeResourceEntryMetrics(entry) {
     const {renderBlockingStatus: renderBlockingStatus} = entry;
     return {
-        resource: polyfills_assign({
+        resource: Object.assign(Object.assign({
             duration: computeResourceEntryDuration(entry),
             render_blocking_status: renderBlockingStatus
-        }, computeResourceEntrySize(entry), computeResourceEntryDetails(entry))
+        }, computeResourceEntrySize(entry)), computeResourceEntryDetails(entry))
     };
 }
 
@@ -3702,7 +3596,7 @@ function trackFirstContentfulPaint(configuration, firstHidden, callback) {
             type: RumPerformanceEntryType.PAINT,
             buffered: !0
         }).subscribe((entries => {
-            const fcpEntry = find(entries, (entry => "first-contentful-paint" === entry.name && entry.startTime < firstHidden.timeStamp && entry.startTime < 6e5));
+            const fcpEntry = entries.find((entry => "first-contentful-paint" === entry.name && entry.startTime < firstHidden.timeStamp && entry.startTime < 6e5));
             fcpEntry && callback(fcpEntry.startTime);
         })).unsubscribe
     };
@@ -3759,7 +3653,7 @@ function getNodeSelfPrivacyLevel(node) {
             const autocomplete = inputElement.getAttribute("autocomplete");
             if (autocomplete && (autocomplete.startsWith("cc-") || autocomplete.endsWith("-password"))) return privacy_NodePrivacyLevel.MASK;
         }
-        return elementMatches(node, getPrivacySelector(privacy_NodePrivacyLevel.HIDDEN)) ? privacy_NodePrivacyLevel.HIDDEN : elementMatches(node, getPrivacySelector(privacy_NodePrivacyLevel.MASK)) ? privacy_NodePrivacyLevel.MASK : elementMatches(node, getPrivacySelector(privacy_NodePrivacyLevel.MASK_USER_INPUT)) ? privacy_NodePrivacyLevel.MASK_USER_INPUT : elementMatches(node, getPrivacySelector(privacy_NodePrivacyLevel.ALLOW)) ? privacy_NodePrivacyLevel.ALLOW : shouldIgnoreElement(node) ? privacy_NodePrivacyLevel.IGNORE : void 0;
+        return node.matches(getPrivacySelector(privacy_NodePrivacyLevel.HIDDEN)) ? privacy_NodePrivacyLevel.HIDDEN : node.matches(getPrivacySelector(privacy_NodePrivacyLevel.MASK)) ? privacy_NodePrivacyLevel.MASK : node.matches(getPrivacySelector(privacy_NodePrivacyLevel.MASK_USER_INPUT)) ? privacy_NodePrivacyLevel.MASK_USER_INPUT : node.matches(getPrivacySelector(privacy_NodePrivacyLevel.ALLOW)) ? privacy_NodePrivacyLevel.ALLOW : shouldIgnoreElement(node) ? privacy_NodePrivacyLevel.IGNORE : void 0;
     }
 }
 
@@ -3841,28 +3735,13 @@ function getActionNameFromElement(element, {enablePrivacyForActionName: enablePr
 }
 
 function getActionNameFromElementProgrammatically(targetElement, programmaticAttribute) {
-    let elementWithAttribute;
-    if (supportsElementClosest()) elementWithAttribute = targetElement.closest(`[${programmaticAttribute}]`); else {
-        let element = targetElement;
-        for (;element; ) {
-            if (element.hasAttribute(programmaticAttribute)) {
-                elementWithAttribute = element;
-                break;
-            }
-            element = getParentElement(element);
-        }
-    }
+    const elementWithAttribute = targetElement.closest(`[${programmaticAttribute}]`);
     if (!elementWithAttribute) return;
     return truncate(normalizeWhitespace(elementWithAttribute.getAttribute(programmaticAttribute).trim()));
 }
 
-const priorityStrategies = [ (element, userProgrammaticAttribute, privacy) => {
-    if (supportsLabelProperty()) {
-        if ("labels" in element && element.labels && element.labels.length > 0) return getActionNameFromTextualContent(element.labels[0], userProgrammaticAttribute);
-    } else if (element.id) {
-        const label = element.ownerDocument && find(element.ownerDocument.querySelectorAll("label"), (label => label.htmlFor === element.id));
-        return label && getActionNameFromTextualContent(label, userProgrammaticAttribute, privacy);
-    }
+const priorityStrategies = [ (element, userProgrammaticAttribute) => {
+    if ("labels" in element && element.labels && element.labels.length > 0) return getActionNameFromTextualContent(element.labels[0], userProgrammaticAttribute);
 }, element => {
     if ("INPUT" === element.nodeName) {
         const input = element, type = input.getAttribute("type");
@@ -3897,7 +3776,7 @@ function getActionNameFromElementForStrategies(targetElement, userProgrammaticAt
             }
         }
         if ("FORM" === element.nodeName) break;
-        element = getParentElement(element), recursionCounter += 1;
+        element = element.parentElement, recursionCounter += 1;
     }
 }
 
@@ -3941,29 +3820,12 @@ function getTextualContent(element, userProgrammaticAttribute, privacyEnabledAct
                     }
                 }
             };
-            return supportsInnerTextScriptAndStyleRemoval() || removeTextFromElements("script, style"), 
-            removeTextFromElements("[data-dd-action-name]"), userProgrammaticAttribute && removeTextFromElements(`[${userProgrammaticAttribute}]`), 
+            return removeTextFromElements("[data-dd-action-name]"), userProgrammaticAttribute && removeTextFromElements(`[${userProgrammaticAttribute}]`), 
             privacyEnabledActionName && removeTextFromElements(`${getPrivacySelector(privacy_NodePrivacyLevel.HIDDEN)}, ${getPrivacySelector(privacy_NodePrivacyLevel.MASK)}`), 
             text;
         }
         return element.textContent;
     }
-}
-
-function supportsInnerTextScriptAndStyleRemoval() {
-    return !isIE();
-}
-
-let supportsLabelPropertyResult, supportsElementClosestResult;
-
-function supportsLabelProperty() {
-    return void 0 === supportsLabelPropertyResult && (supportsLabelPropertyResult = "labels" in HTMLInputElement.prototype), 
-    supportsLabelPropertyResult;
-}
-
-function supportsElementClosest() {
-    return void 0 === supportsElementClosestResult && (supportsElementClosestResult = "closest" in HTMLElement.prototype), 
-    supportsElementClosestResult;
 }
 
 const STABLE_ATTRIBUTES = [ "data-dd-action-name", "data-testid", "data-test", "data-qa", "data-cy", "data-test-id", "data-qa-id", "data-testing", "data-component", "data-element", "data-source-file" ], GLOBALLY_UNIQUE_SELECTOR_GETTERS = [ getStableAttributeSelector, getIDSelector ], UNIQUE_AMONG_CHILDREN_SELECTOR_GETTERS = [ getStableAttributeSelector, getClassSelector, getTagNameSelector ];
@@ -3975,7 +3837,7 @@ function getSelectorFromElement(targetElement, actionNameAttribute) {
         const globallyUniqueSelector = findSelector(currentElement, GLOBALLY_UNIQUE_SELECTOR_GETTERS, isSelectorUniqueGlobally, actionNameAttribute, targetElementSelector);
         if (globallyUniqueSelector) return globallyUniqueSelector;
         targetElementSelector = findSelector(currentElement, UNIQUE_AMONG_CHILDREN_SELECTOR_GETTERS, isSelectorUniqueAmongSiblings, actionNameAttribute, targetElementSelector) || combineSelector(getPositionSelector(currentElement), targetElementSelector), 
-        currentElement = polyfills_getParentElement(currentElement);
+        currentElement = currentElement.parentElement;
     }
     return targetElementSelector;
 }
@@ -3985,20 +3847,20 @@ function isGeneratedValue(value) {
 }
 
 function getIDSelector(element) {
-    if (element.id && !isGeneratedValue(element.id)) return `#${cssEscape(element.id)}`;
+    if (element.id && !isGeneratedValue(element.id)) return `#${CSS.escape(element.id)}`;
 }
 
 function getClassSelector(element) {
     if ("BODY" === element.tagName) return;
-    const classList = getClassList(element);
+    const classList = element.classList;
     for (let i = 0; i < classList.length; i += 1) {
         const className = classList[i];
-        if (!isGeneratedValue(className)) return `${cssEscape(element.tagName)}.${cssEscape(className)}`;
+        if (!isGeneratedValue(className)) return `${CSS.escape(element.tagName)}.${CSS.escape(className)}`;
     }
 }
 
 function getTagNameSelector(element) {
-    return cssEscape(element.tagName);
+    return CSS.escape(element.tagName);
 }
 
 function getStableAttributeSelector(element, actionNameAttribute) {
@@ -4011,15 +3873,15 @@ function getStableAttributeSelector(element, actionNameAttribute) {
         if (selector) return selector;
     }
     function getAttributeSelector(attributeName) {
-        if (element.hasAttribute(attributeName)) return `${cssEscape(element.tagName)}[${attributeName}="${cssEscape(element.getAttribute(attributeName))}"]`;
+        if (element.hasAttribute(attributeName)) return `${CSS.escape(element.tagName)}[${attributeName}="${CSS.escape(element.getAttribute(attributeName))}"]`;
     }
 }
 
 function getPositionSelector(element) {
-    let sibling = polyfills_getParentElement(element).firstElementChild, elementIndex = 1;
+    let sibling = element.parentElement.firstElementChild, elementIndex = 1;
     for (;sibling && sibling !== element; ) sibling.tagName === element.tagName && (elementIndex += 1), 
     sibling = sibling.nextElementSibling;
-    return `${cssEscape(element.tagName)}:nth-of-type(${elementIndex})`;
+    return `${CSS.escape(element.tagName)}:nth-of-type(${elementIndex})`;
 }
 
 function findSelector(element, selectorGetters, predicate, actionNameAttribute, childSelector) {
@@ -4035,11 +3897,11 @@ function isSelectorUniqueGlobally(element, elementSelector, childSelector) {
 
 function isSelectorUniqueAmongSiblings(currentElement, currentElementSelector, childSelector) {
     let isSiblingMatching;
-    if (void 0 === childSelector) isSiblingMatching = sibling => polyfills_elementMatches(sibling, currentElementSelector); else {
+    if (void 0 === childSelector) isSiblingMatching = sibling => sibling.matches(currentElementSelector); else {
         const scopedSelector = supportScopeSelector() ? combineSelector(`${currentElementSelector}:scope`, childSelector) : combineSelector(currentElementSelector, childSelector);
         isSiblingMatching = sibling => null !== sibling.querySelector(scopedSelector);
     }
-    let sibling = polyfills_getParentElement(currentElement).firstElementChild;
+    let sibling = currentElement.parentElement.firstElementChild;
     for (;sibling; ) {
         if (sibling !== currentElement && isSiblingMatching(sibling)) return !1;
         sibling = sibling.nextElementSibling;
@@ -4071,7 +3933,7 @@ function trackFirstInput(configuration, firstHidden, callback) {
         type: RumPerformanceEntryType.FIRST_INPUT,
         buffered: !0
     }).subscribe((entries => {
-        const firstInputEntry = find(entries, (entry => entry.startTime < firstHidden.timeStamp));
+        const firstInputEntry = entries.find((entry => entry.startTime < firstHidden.timeStamp));
         if (firstInputEntry) {
             const firstInputDelay = timeUtils_elapsed(firstInputEntry.startTime, firstInputEntry.processingStart);
             let firstInputTargetSelector;
@@ -4232,7 +4094,7 @@ function trackCumulativeLayoutShift(configuration, viewStart, callback) {
 
 function getTargetFromSource(sources) {
     var _a;
-    if (sources) return null === (_a = find(sources, (source => !!source.node && htmlDomUtils_isElementNode(source.node)))) || void 0 === _a ? void 0 : _a.node;
+    if (sources) return null === (_a = sources.find((source => !!source.node && htmlDomUtils_isElementNode(source.node)))) || void 0 === _a ? void 0 : _a.node;
 }
 
 const MAX_WINDOW_DURATION = 5e3, MAX_UPDATE_GAP = 1e3;
@@ -4819,7 +4681,7 @@ const VISIBILITY_CHECK_DELAY = 6e4, SESSION_CONTEXT_TIMEOUT_DELAY = 144e5;
 let stopCallbacks = [];
 
 function startSessionManager(configuration, productKey, computeSessionState, trackingConsentState) {
-    const renewObservable = new observable_Observable, expireObservable = new observable_Observable, sessionStore = startSessionStore(configuration.sessionStoreStrategyType, productKey, computeSessionState);
+    const renewObservable = new observable_Observable, expireObservable = new observable_Observable, sessionStore = startSessionStore(configuration.sessionStoreStrategyType, configuration, productKey, computeSessionState);
     stopCallbacks.push((() => sessionStore.stop()));
     const sessionContextHistory = createValueHistory({
         expireDelay: 144e5
@@ -5008,7 +4870,7 @@ let preStartTelemetryBuffer = boundedBuffer_createBoundedBuffer(), onRawTelemetr
 
 function startTelemetry(telemetryService, configuration) {
     let contextProvider;
-    const observable = new Observable, alreadySentEvents = new Set, telemetryEnabled = !includes(TELEMETRY_EXCLUDED_SITES, configuration.site) && performDraw(configuration.telemetrySampleRate), telemetryEnabledPerType = {
+    const observable = new Observable, alreadySentEvents = new Set, telemetryEnabled = !TELEMETRY_EXCLUDED_SITES.includes(configuration.site) && performDraw(configuration.telemetrySampleRate), telemetryEnabledPerType = {
         [TelemetryType.log]: telemetryEnabled,
         [TelemetryType.configuration]: telemetryEnabled && performDraw(configuration.telemetryConfigurationSampleRate),
         [TelemetryType.usage]: telemetryEnabled && performDraw(configuration.telemetryUsageSampleRate)
@@ -5021,7 +4883,7 @@ function startTelemetry(telemetryService, configuration) {
                     type: "telemetry",
                     date: timeStampNow(),
                     service: telemetryService,
-                    version: "5.35.0",
+                    version: "6.0.0",
                     source: "browser",
                     _dd: {
                         format_version: 2
@@ -5031,7 +4893,7 @@ function startTelemetry(telemetryService, configuration) {
                         connectivity: getConnectivity(),
                         sdk_setup: "cdn"
                     }),
-                    experimental_features: arrayFrom(getExperimentalFeatures())
+                    experimental_features: Array.from(getExperimentalFeatures())
                 }, void 0 !== contextProvider ? contextProvider() : {});
             }(telemetryService, rawEvent, runtimeEnvInfo);
             observable.notify(event), sendToExtension("telemetry", event), alreadySentEvents.add(stringifiedEvent);
@@ -5074,7 +4936,7 @@ function isTelemetryReplicationAllowed(configuration) {
 }
 
 function addTelemetryDebug(message, context) {
-    displayIfDebugEnabled(ConsoleApiName.debug, message, context), onRawTelemetryEventCollected(assign({
+    displayIfDebugEnabled(ConsoleApiName.debug, message, context), onRawTelemetryEventCollected(Object.assign({
         type: TelemetryType.log,
         message: message,
         status: "debug"
@@ -5082,10 +4944,10 @@ function addTelemetryDebug(message, context) {
 }
 
 function addTelemetryError(e, context) {
-    onRawTelemetryEventCollected(polyfills_assign({
+    onRawTelemetryEventCollected(Object.assign(Object.assign({
         type: rawTelemetryEvent_types_TelemetryType.log,
         status: "error"
-    }, formatError(e), context));
+    }, formatError(e)), context));
 }
 
 function addTelemetryConfiguration(configuration) {
@@ -5122,7 +4984,7 @@ function formatError(e) {
 }
 
 function scrubCustomerFrames(stackTrace) {
-    return stackTrace.stack = stackTrace.stack.filter((frame => !frame.url || ALLOWED_FRAME_URLS.some((allowedFrameUrl => startsWith(frame.url, allowedFrameUrl))))), 
+    return stackTrace.stack = stackTrace.stack.filter((frame => !frame.url || ALLOWED_FRAME_URLS.some((allowedFrameUrl => frame.url.startsWith(allowedFrameUrl))))), 
     stackTrace;
 }
 
@@ -5460,7 +5322,7 @@ function startCustomerDataTelemetry(configuration, telemetry, lifeCycle, custome
     initCurrentPeriodMeasures(), initCurrentBatchMeasures(), lifeCycle.subscribe(12, (event => {
         batchHasRumEvent = !0, updateMeasure(currentBatchMeasures.globalContextBytes, customerDataTrackerManager.getOrCreateTracker(2).getBytesCount()), 
         updateMeasure(currentBatchMeasures.userContextBytes, customerDataTrackerManager.getOrCreateTracker(1).getBytesCount()), 
-        updateMeasure(currentBatchMeasures.featureFlagBytes, polyfills_includes([ "view", "error" ], event.type) ? customerDataTrackerManager.getOrCreateTracker(0).getBytesCount() : 0);
+        updateMeasure(currentBatchMeasures.featureFlagBytes, [ "view", "error" ].includes(event.type) ? customerDataTrackerManager.getOrCreateTracker(0).getBytesCount() : 0);
     })), batchFlushObservable.subscribe((({bytesCount: bytesCount, messagesCount: messagesCount}) => {
         batchHasRumEvent && (currentPeriodMeasures.batchCount += 1, updateMeasure(currentPeriodMeasures.batchBytesCount, bytesCount), 
         updateMeasure(currentPeriodMeasures.batchMessagesCount, messagesCount), mergeMeasure(currentPeriodMeasures.globalContextBytes, currentBatchMeasures.globalContextBytes), 
@@ -5585,7 +5447,7 @@ function createCookieObservable(configuration, cookieName) {
 
 function listenToCookieStoreChange(configuration) {
     return (cookieName, callback) => addEventListener(configuration, window.cookieStore, "change", (event => {
-        const changeEvent = find(event.changed, (event => event.name === cookieName)) || find(event.deleted, (event => event.name === cookieName));
+        const changeEvent = event.changed.find((event => event.name === cookieName)) || event.deleted.find((event => event.name === cookieName));
         changeEvent && callback(changeEvent.value);
     })).stop;
 }
@@ -5620,7 +5482,94 @@ function startCiVisibilityContext(configuration, cookieObservable = createCookie
     };
 }
 
+function startLongAnimationFrameCollection(lifeCycle, configuration) {
+    const performanceResourceSubscription = createPerformanceObservable(configuration, {
+        type: RumPerformanceEntryType.LONG_ANIMATION_FRAME,
+        buffered: !0
+    }).subscribe((entries => {
+        for (const entry of entries) {
+            const startClocks = relativeToClocks(entry.startTime), rawRumEvent = {
+                date: startClocks.timeStamp,
+                long_task: {
+                    id: generateUUID(),
+                    entry_type: "long-animation-frame",
+                    duration: toServerDuration(entry.duration),
+                    blocking_duration: toServerDuration(entry.blockingDuration),
+                    first_ui_event_timestamp: toServerDuration(entry.firstUIEventTimestamp),
+                    render_start: toServerDuration(entry.renderStart),
+                    style_and_layout_start: toServerDuration(entry.styleAndLayoutStart),
+                    start_time: toServerDuration(entry.startTime),
+                    scripts: entry.scripts.map((script => ({
+                        duration: toServerDuration(script.duration),
+                        pause_duration: toServerDuration(script.pauseDuration),
+                        forced_style_and_layout_duration: toServerDuration(script.forcedStyleAndLayoutDuration),
+                        start_time: toServerDuration(script.startTime),
+                        execution_start: toServerDuration(script.executionStart),
+                        source_url: script.sourceURL,
+                        source_function_name: script.sourceFunctionName,
+                        source_char_position: script.sourceCharPosition,
+                        invoker: script.invoker,
+                        invoker_type: script.invokerType,
+                        window_attribution: script.windowAttribution
+                    })))
+                },
+                type: "long_task",
+                _dd: {
+                    discarded: !1
+                }
+            };
+            lifeCycle.notify(11, {
+                rawRumEvent: rawRumEvent,
+                startTime: startClocks.relative,
+                domainContext: {
+                    performanceEntry: entry
+                }
+            });
+        }
+    }));
+    return {
+        stop: () => performanceResourceSubscription.unsubscribe()
+    };
+}
+
+function startLongTaskCollection(lifeCycle, configuration) {
+    const performanceLongTaskSubscription = createPerformanceObservable(configuration, {
+        type: RumPerformanceEntryType.LONG_TASK,
+        buffered: !0
+    }).subscribe((entries => {
+        for (const entry of entries) {
+            if (entry.entryType !== RumPerformanceEntryType.LONG_TASK) break;
+            if (!configuration.trackLongTasks) break;
+            const startClocks = relativeToClocks(entry.startTime), rawRumEvent = {
+                date: startClocks.timeStamp,
+                long_task: {
+                    id: generateUUID(),
+                    entry_type: "long-task",
+                    duration: toServerDuration(entry.duration)
+                },
+                type: "long_task",
+                _dd: {
+                    discarded: !1
+                }
+            };
+            lifeCycle.notify(11, {
+                rawRumEvent: rawRumEvent,
+                startTime: startClocks.relative,
+                domainContext: {
+                    performanceEntry: entry
+                }
+            });
+        }
+    }));
+    return {
+        stop() {
+            performanceLongTaskSubscription.unsubscribe();
+        }
+    };
+}
+
 function startRum(configuration, recorderApi, customerDataTrackerManager, getCommonContext, initialViewOptions, createEncoder, trackingConsentState, customVitalsState) {
+    var _a;
     const cleanupTasks = [], lifeCycle = new LifeCycle, reportError = error => {
         lifeCycle.notify(13, {
             error: error
@@ -5638,7 +5587,10 @@ function startRum(configuration, recorderApi, customerDataTrackerManager, getCom
     const {addTiming: addTiming, startView: startView, setViewName: setViewName, setViewContext: setViewContext, setViewContextProperty: setViewContextProperty, stop: stopViewCollection} = startViewCollection(lifeCycle, configuration, location, domMutationObservable, windowOpenObservable, locationChangeObservable, "featureFlagContexts", pageStateHistory, recorderApi, initialViewOptions);
     cleanupTasks.push(stopViewCollection);
     const {stop: stopResourceCollection} = startResourceCollection(lifeCycle, configuration, pageStateHistory);
-    cleanupTasks.push(stopResourceCollection), startLongTaskCollection(lifeCycle, configuration);
+    if (cleanupTasks.push(stopResourceCollection), configuration.trackLongTasks) if (null === (_a = PerformanceObserver.supportedEntryTypes) || void 0 === _a ? void 0 : _a.includes(RumPerformanceEntryType.LONG_ANIMATION_FRAME)) {
+        const {stop: stopLongAnimationFrameCollection} = startLongAnimationFrameCollection(lifeCycle, configuration);
+        cleanupTasks.push(stopLongAnimationFrameCollection);
+    } else startLongTaskCollection(lifeCycle, configuration);
     const {addError: addError} = startErrorCollection(lifeCycle, configuration, pageStateHistory, "featureFlagContexts");
     startRequestCollection(lifeCycle, configuration, session);
     const vitalCollection = startVitalCollection(lifeCycle, pageStateHistory, customVitalsState), internalContext = startInternalContext(configuration.applicationId, session, viewHistory, actionContexts, urlContexts);
