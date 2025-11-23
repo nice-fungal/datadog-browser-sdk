@@ -1335,7 +1335,6 @@ function generateUUID(placeholder) {
 const COMMA_SEPARATED_KEY_VALUE = /([\w-]+)\s*=\s*([^;]+)/g;
 function findCommaSeparatedValue(rawString, name) {
     COMMA_SEPARATED_KEY_VALUE.lastIndex = 0;
-    // eslint-disable-next-line no-constant-condition
     while (true) {
         const match = COMMA_SEPARATED_KEY_VALUE.exec(rawString);
         if (match) {
@@ -1351,7 +1350,6 @@ function findCommaSeparatedValue(rawString, name) {
 function findCommaSeparatedValues(rawString) {
     const result = new Map();
     COMMA_SEPARATED_KEY_VALUE.lastIndex = 0;
-    // eslint-disable-next-line no-constant-condition
     while (true) {
         const match = COMMA_SEPARATED_KEY_VALUE.exec(rawString);
         if (match) {
@@ -4940,6 +4938,9 @@ function createSpanIdentifier() {
     return createIdentifier(63);
 }
 let createIdentifierImplementationCache;
+function clearIdentifierImplementationCache() {
+    createIdentifierImplementationCache = undefined;
+}
 function createIdentifier(bits) {
     if (!createIdentifierImplementationCache) {
         createIdentifierImplementationCache =

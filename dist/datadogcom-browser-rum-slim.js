@@ -3208,6 +3208,10 @@ function createSpanIdentifier() {
     return createIdentifier(63);
 }
 
+function clearIdentifierImplementationCache() {
+    createIdentifierImplementationCache = void 0;
+}
+
 function createIdentifier(bits) {
     return createIdentifierImplementationCache || (createIdentifierImplementationCache = createIdentifierUsingUint32Array), 
     createIdentifierImplementationCache(bits);
